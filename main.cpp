@@ -7,7 +7,7 @@
 #include "Source/Utils/Gzstream.hpp"
 #include "Source/Utils/Json.hpp"
 #include "Source/Utils/Pugixml.hpp"
-#include "Source/Utils/TypeToString.hpp"
+#include "Source/Utils/String.hpp"
 #include "Source/Utils/Assume.hpp"
 #include "Source/Utils/Array.hpp"
 #include "Source/Utils/Map.hpp"
@@ -48,6 +48,10 @@ int main()
 
     NVector v;
     v = NVector::UpVector();
+
+    std::string t1 = "test test";
+    std::string t2 = NString::split(t1," ");
+    std::cout << "-" << t1 << "-" << t2 << "-" << std::endl;
 
     bool error = true;
     Assume(!error);
