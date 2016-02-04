@@ -4,6 +4,6 @@ NRenderable::NRenderable()
 {
 }
 
-void NRenderable::render()
+void NRenderable::render(sf::RenderTarget& target)
 {
 }

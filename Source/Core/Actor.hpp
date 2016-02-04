@@ -12,8 +12,8 @@ class NActor
         NVector getScale() const;
         float getRotation() const;
 
-        void attachComponent(Component* component);
-        void detachComponent(Component* component);
+        void attachComponent(NComponent* component);
+        void detachComponent(NComponent* component);
 
     protected:
         NRootComponent mRootComponent;

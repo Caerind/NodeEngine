@@ -6,8 +6,7 @@
 #include "AudioManager.hpp"
 #include "ResourceManager.hpp"
 #include "LangManager.hpp"
-#include "Log.hpp"
-#include "../Helper/KeyBinding.hpp"
+#include "../Utils/Log.hpp"
 
 namespace ah
 {
@@ -24,8 +23,6 @@ class Application
         static AudioManager& getAudio();
         static ResourceManager& getResources();
         static LangManager& getLang();
-        static Log& getLog();
-        static lp::KeyBinding& getBinding();
 
     private:
         Application();
@@ -38,12 +35,8 @@ class Application
         AudioManager mAudio;
         ResourceManager mResources;
         LangManager mLang;
-        Log mLog;
-        lp::KeyBinding mBinding;
 };
 
 } // namespace ah
-
-#define ah_Log ah::Application::getLog()
 
 #endif // AH_APPLICATION_HPP

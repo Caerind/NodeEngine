@@ -1,8 +1,6 @@
 #include "StateManager.hpp"
 #include "State.hpp"
 
-#include <cassert>
-
 namespace ah
 {
 
@@ -130,7 +128,7 @@ void StateManager::applyPendingChanges()
 State::Ptr StateManager::createState(std::string const& id)
 {
 	auto found = mFactories.find(id);
-	assert(found != mFactories.end());
+	Assume((found != mFactories.end()));
 	return found->second();
 }
 

@@ -3,6 +3,7 @@
 
 #include "Component.hpp"
 
+class NActor;
 class NRootComponent : public NComponent
 {
     public:

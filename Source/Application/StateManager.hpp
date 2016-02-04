@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "../Utils/String.hpp"
+#include "../Utils/Assume.hpp"
 
 #include "State.hpp"
 
@@ -65,7 +66,7 @@ class StateManager
 template<typename T>
 void StateManager::registerState()
 {
-    std::string t = lp::type<T>();
+    std::string t = NString::Type<T>();
 	mFactories[t] = [this] ()
 	{
 		return State::Ptr(new T(*this));
@@ -75,7 +76,7 @@ void StateManager::registerState()
 template <typename T>
 void StateManager::pushState()
 {
-	mPendingList.push_back(PendingChange(Push, lp::type<T>()));
+	mPendingList.push_back(PendingChange(Push, NString::Type<T>()));
 }
 
 } // namespace ah

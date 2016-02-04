@@ -427,7 +427,8 @@ Playlist::Playlist(std::vector<std::string> const& filenames, bool loop, sf::Vec
     mRandomPlayed = 0;
     if (mRandom)
     {
-        mActualId = thor::random(0,static_cast<int>(mFilenames.size()-1));
+        //mActualId = thor::random(0,static_cast<int>(mFilenames.size()-1));
+        mActualId = 0;
     }
     else
     {
@@ -468,7 +469,8 @@ void Playlist::update()
             mRandomPlayed++;
             if (mLoop || mRandomPlayed < mFilenames.size())
             {
-                mActualId = thor::random(0,static_cast<int>(mFilenames.size()-1));
+                //mActualId = thor::random(0,static_cast<int>(mFilenames.size()-1));
+                mActualId = (mActualId + 1) % (mFilenames.size());
                 mMusic.openFromFile(mFilenames[mActualId]);
                 play();
             }

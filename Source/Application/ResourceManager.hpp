@@ -6,10 +6,9 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 
-#include <Thor/Resources.hpp>
-
-#include "../Helper/pugixml.hpp"
-#include "../Helper/TypeToString.hpp"
+#include "../Utils/Pugixml.hpp"
+#include "../Utils/String.hpp"
+#include "../Utils/Assume.hpp"
 
 namespace ah
 {
@@ -78,14 +77,13 @@ template <typename T>
 ResourceManager::Resource ResourceManager::ResourceHolder<T>::load(std::string const& id, std::string const& filename)
 {
     Resource r;
-    r.type = lp::type<T>();
+    r.type = NString::Type<T>();
     r.id = id;
     r.filename = filename;
     resources[r.id].first = r;
     if (!resources[r.id].second.loadFromFile(filename))
     {
         resources[r.id].first.loaded = false;
-        throw thor::ResourceLoadingException("Can't load " + filename);
     }
     else
     {
@@ -118,7 +116,7 @@ T& ResourceManager::ResourceHolder<T>::get(std::string const& id, std::string co
             return itr->second.second;
         }
     }
-    assert(false && "File don't exists");
+    Assume(false);
 }
 
 template <typename T>

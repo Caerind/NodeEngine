@@ -4,6 +4,6 @@ NTickable::NTickable()
 {
 }
 
-void NTickable::tick(float dt)
+void NTickable::tick(sf::Time dt)
 {
 }

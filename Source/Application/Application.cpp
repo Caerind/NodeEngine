@@ -87,16 +87,6 @@ LangManager& Application::getLang()
     return mInstance.mLang;
 }
 
-Log& Application::getLog()
-{
-    return mInstance.mLog;
-}
-
-lp::KeyBinding& Application::getBinding()
-{
-    return mInstance.mBinding;
-}
-
 Application::Application()
 {
 }

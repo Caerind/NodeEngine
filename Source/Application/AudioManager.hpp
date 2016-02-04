@@ -6,7 +6,7 @@
 
 #include <SFML/Audio.hpp>
 
-#include <Thor/Math.hpp>
+//#include <Thor/Math.hpp>
 
 namespace ah
 {

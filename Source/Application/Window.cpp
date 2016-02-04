@@ -309,7 +309,7 @@ void Window::setMouseCursorOrigin(sf::Vector2f const& origin)
 
 void Window::screenshot()
 {
-    capture().saveToFile(mScreenshotPath + lp::getTime("%Y-%m-%d_%H-%M-%S") + ".png");
+    capture().saveToFile(mScreenshotPath + NTime::getTime("%Y-%m-%d_%H-%M-%S") + ".png");
 }
 
 void Window::setScreenshotPath(std::string const& screenshotPath)

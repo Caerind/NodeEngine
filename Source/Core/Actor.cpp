@@ -14,7 +14,7 @@ NVector NActor::getScale() const
     return mRootComponent.scale;
 }
 
-NVector NActor::getRotation() const
+float NActor::getRotation() const
 {
     return mRootComponent.rotation;
 }
