@@ -12,25 +12,37 @@ void NWorld::addEvent(sf::Event const& event)
     mInstance.mEvents.add(event);
 }
 
+/*
+bool NWorld::testEvent(sf::Event const& event)
+{
+    for (std::size_t i = 0; i < mInstance.mEvents.size(); i++)
+    {
+        if (event == mInstance.mEvents[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}*/
+
+bool NWorld::testAction(NAction const& action)
+{
+    for (std::size_t i = 0; i < mInstance.mEvents.size(); i++)
+    {
+        if (action == mInstance.mEvents[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void NWorld::tick(sf::Time dt)
 {
     for (auto itr = mInstance.mTickables.begin(); itr != mInstance.mTickables.end(); itr++)
     {
         (*itr)->tick(dt);
     }
-}
-
-bool NWorld::input(sf::Event const& event)
-{
-    for (auto itr = mInstance.mEvents.begin(); itr != mInstance.mEvents.end(); itr++)
-    {
-        // TODO : Compare event
-        //if (*itr == event)
-        {
-            //return true;
-        }
-    }
-    return false;
 }
 
 void NWorld::render(sf::RenderTarget& target)

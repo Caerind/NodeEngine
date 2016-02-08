@@ -7,6 +7,7 @@ class NRenderable
 {
     public:
         NRenderable();
+        ~NRenderable();
 
         virtual void render(sf::RenderTarget& target);
 };

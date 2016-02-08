@@ -15,6 +15,7 @@ Window::Window()
     mDebugInfoColor = sf::Color::White;
     mDebugInfoCharsize = 15;
     mStyle = sf::Style::Close;
+    mBackground.setFillColor(sf::Color::Black);
 
     if (!load())
     {

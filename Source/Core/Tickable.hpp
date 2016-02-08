@@ -7,6 +7,7 @@ class NTickable
 {
     public:
         NTickable();
+        ~NTickable();
 
         virtual void tick(sf::Time dt);
 };

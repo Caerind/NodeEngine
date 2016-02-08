@@ -7,6 +7,7 @@
 #include "Renderable.hpp"
 #include "Tickable.hpp"
 #include "Actor.hpp"
+#include "Action.hpp"
 
 #include "../Utils/Array.hpp"
 
@@ -18,11 +19,12 @@ class NWorld
         // Add an event to the list
         static void addEvent(sf::Event const& event);
 
+        // Test if an event exist
+        //static bool testEvent(sf::Event const& event);
+        static bool testAction(NAction const& action);
+
         // Tick the world
         static void tick(sf::Time dt);
-
-        // Test if an event if happening
-        static bool input(sf::Event const& event);
 
         // Render the world
         static void render(sf::RenderTarget& target);
