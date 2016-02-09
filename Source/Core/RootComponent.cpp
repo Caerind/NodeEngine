@@ -3,6 +3,8 @@
 
 NRootComponent::NRootComponent(NActor* actor)
 {
+    mParent = nullptr;
+    mActor = actor;
 }
 
 

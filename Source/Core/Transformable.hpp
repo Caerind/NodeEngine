@@ -2,17 +2,30 @@
 #define NTRANSFORMABLE_HPP
 
 #include "../Utils/Vector.hpp"
+#include <SFML/Graphics/Transformable.hpp>
+#include <SFML/Graphics/Transform.hpp>
 
 class NTransformable
 {
     public:
         NTransformable();
 
-        NVector position;
-        NVector scale;
-        float rotation;
+        NVector getPosition() const;
+        void setPosition(NVector const& position);
+        void setPosition(float x, float y, float z = 0.f);
 
-        //sf::Transform getTransform();
+        NVector getScale() const;
+        void setScale(NVector const& scale);
+        void setScale(float x, float y);
+
+        float getRotation() const;
+        void setRotation(float rotation);
+
+        sf::Transform getTransform() const;
+
+    private:
+        sf::Transformable mTransformable;
+        float mZ;
 };
 
 #endif // NTRANSFORMABLE_HPP

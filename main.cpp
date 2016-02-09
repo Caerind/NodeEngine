@@ -10,11 +10,32 @@ class TestActor : public NActor
     public:
         TestActor() : NActor()
         {
+            setPosition(400,300);
+
             mSpriteComponent.setTexture(ah::Application::getResources().getTexture("icon"));
             attachComponent(&mSpriteComponent);
 
-            mInputComponent.setAction("m",sf::Keyboard::D,1);
-            mInputComponent.bind("m",[&](sf::Time dt){std::cout << "t" << std::endl;});
+            mInputComponent.setAction("m+",sf::Keyboard::D);
+            mInputComponent.bind("m+",[&](sf::Time dt)
+            {
+                mSpriteComponent.setPosition(mSpriteComponent.getPosition() + 90 * dt.asSeconds() * NVector::RightVector());
+            });
+            mInputComponent.setAction("m-",sf::Keyboard::Q);
+            mInputComponent.bind("m-",[&](sf::Time dt)
+            {
+                mSpriteComponent.setPosition(mSpriteComponent.getPosition() - 90 * dt.asSeconds() * NVector::RightVector());
+            });
+
+            mInputComponent.setAction("r+",sf::Keyboard::Z);
+            mInputComponent.bind("r+",[&](sf::Time dt)
+            {
+                mInputComponent.setActorRotation(mInputComponent.getActorRotation() + 180 * dt.asSeconds());
+            });
+            mInputComponent.setAction("r-",sf::Keyboard::S);
+            mInputComponent.bind("r-",[&](sf::Time dt)
+            {
+                mInputComponent.setActorRotation(mInputComponent.getActorRotation() - 180 * dt.asSeconds());
+            });
             attachComponent(&mInputComponent);
         }
 

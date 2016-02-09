@@ -17,6 +17,6 @@ void NSpriteComponent::setTextureRect(sf::IntRect const& rect)
 void NSpriteComponent::render(sf::RenderTarget& target)
 {
     sf::RenderStates states;
-    // TODO : Transform
+    states.transform *= getFinalTransform();
     target.draw(mSprite, states);
 }
