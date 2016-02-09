@@ -1,19 +1,36 @@
 #include <iostream>
 
+#include <SFML/Window/Mouse.hpp>
+
 #include "Source/Application/Application.hpp"
 #include "Source/Core/World.hpp"
 #include "Source/Core/SpriteComponent.hpp"
 #include "Source/Core/InputComponent.hpp"
+#include "Source/Core/CameraComponent.hpp"
+
+class EActor : public NActor
+{
+    public:
+        EActor()
+        {
+            mSpriteComponent.setTexture(ah::Application::getResources().getTexture("icon"));
+            attachComponent(&mSpriteComponent);
+        }
+
+        NSpriteComponent mSpriteComponent;
+};
 
 class TestActor : public NActor
 {
     public:
-        TestActor() : NActor()
+        TestActor()
         {
             setPosition(400,300);
 
             mSpriteComponent.setTexture(ah::Application::getResources().getTexture("icon"));
             attachComponent(&mSpriteComponent);
+
+            mSpriteComponent.attachComponent(&mCameraComponent);
 
             mInputComponent.setAction("m+",sf::Keyboard::D);
             mInputComponent.bind("m+",[&](sf::Time dt)
@@ -42,6 +59,7 @@ class TestActor : public NActor
     private:
         NInputComponent mInputComponent;
         NSpriteComponent mSpriteComponent;
+        NCameraComponent mCameraComponent;
 };
 
 class EState : public ah::State
@@ -49,7 +67,22 @@ class EState : public ah::State
     public:
         EState(ah::StateManager& manager) : ah::State(manager)
         {
-            NWorld::addActor(&t);
+            mPlayer = NWorld::createActor<TestActor>();
+            mController.setAction("c1",sf::Mouse::Left,NAction::Pressed);
+            mController.bind("c1",[&](sf::Time dt)
+            {
+                for (std::size_t i = 0; i < 10; i++)
+                    NWorld::createActor<EActor>()->setPosition(NWorld::getMousePositionView() - 10.f * NVector::UpVector());
+                std::cout << "added1" << std::endl;
+            });
+
+            mController.setAction("c2",sf::Mouse::Right,NAction::Pressed);
+            mController.bind("c2",[&](sf::Time dt)
+            {
+                for (std::size_t i = 0; i < 10; i++)
+                    NWorld::createActor<EActor>()->setPosition(NWorld::getMousePositionView() + 10.f * NVector::UpVector());
+                std::cout << "added2" << std::endl;
+            });
         }
 
         bool handleEvent(sf::Event const& event)
@@ -62,6 +95,9 @@ class EState : public ah::State
         {
             NWorld::tick(dt);
             NWorld::update();
+            ah::Application::getWindow().setDebugInfo("Actors",std::to_string(NWorld::getActorCount()));
+            ah::Application::getWindow().setDebugInfo("Tickables",std::to_string(NWorld::getTickableCount()));
+            ah::Application::getWindow().setDebugInfo("Renderables",std::to_string(NWorld::getRenderableCount()));
             return true;
         }
 
@@ -71,7 +107,8 @@ class EState : public ah::State
         }
 
     private:
-        TestActor t;
+        TestActor::Ptr mPlayer;
+        NActionTarget mController;
 };
 
 int main()
@@ -79,6 +116,8 @@ int main()
     ah::Application::getResources().loadTexture("icon","icon.png");
 
     ah::Application::getWindow().create(sf::VideoMode(800,600),"NodeEngine");
+    ah::Application::getWindow().showDebugInfo(true);
+    ah::Application::getWindow().setDebugInfoFont("sansation.ttf");
 
     ah::Application::getStates().registerState<EState>();
     ah::Application::getStates().pushState<EState>();

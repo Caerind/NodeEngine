@@ -1,4 +1,5 @@
 #include "World.hpp"
+#include "../Application/Application.hpp"
 
 NWorld NWorld::mInstance;
 
@@ -47,12 +48,33 @@ void NWorld::tick(sf::Time dt)
 
 void NWorld::render(sf::RenderTarget& target)
 {
-    // TODO : Sort
+    mInstance.mRenderables.sort([](NSceneComponent* a, NSceneComponent* b) -> bool
+    {
+       if (a != nullptr && b != nullptr)
+       {
+           if (a->getFinalZ() < b->getFinalZ())
+           {
+                return true;
+           }
+           else if (a->getFinalZ() > b->getFinalZ())
+           {
+               return false;
+           }
+           else
+           {
+               return (a->getFinalPosition().y < b->getFinalPosition().y);
+           }
+       }
+       return true;
+    });
 
+    sf::View old = target.getView();
+    target.setView(mInstance.mCameraManager.getActiveView());
     for (auto itr = mInstance.mRenderables.begin(); itr != mInstance.mRenderables.end(); itr++)
     {
         (*itr)->render(target);
     }
+    target.setView(old);
 }
 
 void NWorld::update()
@@ -97,22 +119,48 @@ void NWorld::update()
     mInstance.mActorsDeletions.clear();
 }
 
-void NWorld::addActor(NActor* actor)
-{
-    mInstance.mActorsAdditions.add(actor);
-}
-
-void NWorld::removeActor(NActor* actor)
+void NWorld::removeActor(NActor::Ptr actor)
 {
     mInstance.mActorsDeletions.add(actor);
 }
 
-void NWorld::addRenderable(NRenderable* renderable)
+NCameraManager& NWorld::getCameraManager()
+{
+    return mInstance.mCameraManager;
+}
+
+std::size_t NWorld::getActorCount()
+{
+    return mInstance.mActors.size();
+}
+
+std::size_t NWorld::getRenderableCount()
+{
+    return mInstance.mRenderables.size();
+}
+
+std::size_t NWorld::getTickableCount()
+{
+    return mInstance.mTickables.size();
+}
+
+NVector NWorld::getMousePositionScreen()
+{
+    return NVector::SFML2FToN(ah::Application::getWindow().getMousePosition());
+}
+
+NVector NWorld::getMousePositionView()
+{
+    return NVector::SFML2FToN(ah::Application::getWindow().getMousePositionView(mInstance.mCameraManager.getActiveView()));
+}
+
+
+void NWorld::addRenderable(NSceneComponent* renderable)
 {
     mRenderablesAdditions.add(renderable);
 }
 
-void NWorld::removeRenderable(NRenderable* renderable)
+void NWorld::removeRenderable(NSceneComponent* renderable)
 {
     mRenderablesDeletions.add(renderable);
 }

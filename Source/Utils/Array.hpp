@@ -30,7 +30,7 @@ NArray<T>::NArray()
 template <typename T>
 void NArray<T>::sort(std::function<bool(T const& a, T const& b)> function)
 {
-    std::sort(std::vector<T>::begin(),std::vector<T>::end(),function,std::vector<T>::end());
+    std::sort(std::vector<T>::begin(),std::vector<T>::end(),function);
 }
 
 template <typename T>

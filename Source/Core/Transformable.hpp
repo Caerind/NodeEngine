@@ -10,18 +10,18 @@ class NTransformable
     public:
         NTransformable();
 
-        NVector getPosition() const;
-        void setPosition(NVector const& position);
-        void setPosition(float x, float y, float z = 0.f);
+        virtual NVector getPosition() const;
+        virtual void setPosition(NVector const& position);
+        virtual void setPosition(float x, float y, float z = 0.f);
 
-        NVector getScale() const;
-        void setScale(NVector const& scale);
-        void setScale(float x, float y);
+        virtual NVector getScale() const;
+        virtual void setScale(NVector const& scale);
+        virtual void setScale(float x, float y);
 
-        float getRotation() const;
-        void setRotation(float rotation);
+        virtual float getRotation() const;
+        virtual void setRotation(float rotation);
 
-        sf::Transform getTransform() const;
+        virtual sf::Transform getTransform() const;
 
     private:
         sf::Transformable mTransformable;

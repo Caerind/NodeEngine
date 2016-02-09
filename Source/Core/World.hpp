@@ -4,10 +4,11 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include "Renderable.hpp"
+#include "CameraManager.hpp"
 #include "Tickable.hpp"
 #include "Actor.hpp"
 #include "Action.hpp"
+#include "SceneComponent.hpp"
 
 #include "../Utils/Array.hpp"
 
@@ -32,15 +33,28 @@ class NWorld
         // Update the world : use temp array and then clear them
         static void update();
 
+        template <typename T>
+        static std::shared_ptr<T> createActor();
+
         // Add an actor
-        static void addActor(NActor* actor);
+        static void addActor(NActor::Ptr actor);
 
         // Remove an actor
-        static void removeActor(NActor* actor);
+        static void removeActor(NActor::Ptr actor);
+
+        // CameraManager
+        static NCameraManager& getCameraManager();
+
+        static std::size_t getActorCount();
+        static std::size_t getRenderableCount();
+        static std::size_t getTickableCount();
+
+        static NVector getMousePositionScreen();
+        static NVector getMousePositionView();
 
         /* These following arent static cause they shouldn't be use directly */
-        void addRenderable(NRenderable* renderable);
-        void removeRenderable(NRenderable* renderable);
+        void addRenderable(NSceneComponent* renderable);
+        void removeRenderable(NSceneComponent* renderable);
         void addTickable(NTickable* tickable);
         void removeTickable(NTickable* tickable);
 
@@ -53,17 +67,27 @@ class NWorld
     private:
         NArray<sf::Event> mEvents;
 
-        NArray<NActor*> mActors;
-        NArray<NActor*> mActorsAdditions;
-        NArray<NActor*> mActorsDeletions;
+        NArray<NActor::Ptr> mActors;
+        NArray<NActor::Ptr> mActorsAdditions;
+        NArray<NActor::Ptr> mActorsDeletions;
 
-        NArray<NRenderable*> mRenderables;
-        NArray<NRenderable*> mRenderablesAdditions;
-        NArray<NRenderable*> mRenderablesDeletions;
+        NArray<NSceneComponent*> mRenderables;
+        NArray<NSceneComponent*> mRenderablesAdditions;
+        NArray<NSceneComponent*> mRenderablesDeletions;
 
         NArray<NTickable*> mTickables;
         NArray<NTickable*> mTickablesAdditions;
         NArray<NTickable*> mTickablesDeletions;
+
+        NCameraManager mCameraManager;
 };
+
+template <typename T>
+std::shared_ptr<T> NWorld::createActor()
+{
+    std::shared_ptr<T> actor = std::make_shared<T>();
+    mInstance.mActorsAdditions.add(actor);
+    return actor;
+}
 
 #endif // NWORLD_HPP

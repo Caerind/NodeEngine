@@ -2,12 +2,15 @@
 #define NSCENECOMPONENT_HPP
 
 #include "Component.hpp"
-#include "Renderable.hpp"
+#include <SFML/Graphics/RenderTarget.hpp>
 
-class NSceneComponent : public NComponent, public NRenderable
+class NSceneComponent : public NComponent
 {
     public:
         NSceneComponent();
+        ~NSceneComponent();
+
+        virtual void render(sf::RenderTarget& target);
 };
 
 #endif // NSCENECOMPONENT_HPP
