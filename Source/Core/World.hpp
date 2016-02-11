@@ -11,6 +11,9 @@
 #include "SceneComponent.hpp"
 
 #include "../Utils/Array.hpp"
+#include "../Utils/Pugixml.hpp"
+
+#include "../Application/Application.hpp"
 
 class NWorld
 {
@@ -42,6 +45,12 @@ class NWorld
         // Remove an actor
         static void removeActor(NActor::Ptr actor);
 
+        // Get an actor
+        static NActor::Ptr getActor(std::size_t index);
+
+        static bool load(std::string const& filename);
+        static bool save(std::string const& filename);
+
         // CameraManager
         static NCameraManager& getCameraManager();
 
@@ -51,6 +60,9 @@ class NWorld
 
         static NVector getMousePositionScreen();
         static NVector getMousePositionView();
+
+        static ah::ResourceManager& getResources();
+        static ah::Window& getWindow();
 
         /* These following arent static cause they shouldn't be use directly */
         void addRenderable(NSceneComponent* renderable);

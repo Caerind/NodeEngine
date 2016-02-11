@@ -17,6 +17,17 @@ class EActor : public NActor
             attachComponent(&mSpriteComponent);
         }
 
+        bool contains(NVector const& position)
+        {
+            return mSpriteComponent.contains(position);
+        }
+
+        void save(pugi::xml_node& node)
+        {
+            pugi::xml_node n = node.append_child("Sprite");
+            mSpriteComponent.save(n);
+        }
+
         NSpriteComponent mSpriteComponent;
 };
 
@@ -71,17 +82,25 @@ class EState : public ah::State
             mController.setAction("c1",sf::Mouse::Left,NAction::Pressed);
             mController.bind("c1",[&](sf::Time dt)
             {
-                for (std::size_t i = 0; i < 10; i++)
-                    NWorld::createActor<EActor>()->setPosition(NWorld::getMousePositionView() - 10.f * NVector::UpVector());
-                std::cout << "added1" << std::endl;
+                NWorld::createActor<EActor>()->setPosition(NWorld::getMousePositionView() - 10.f * NVector::UpVector());
+                std::cout << "added" << std::endl;
             });
 
             mController.setAction("c2",sf::Mouse::Right,NAction::Pressed);
             mController.bind("c2",[&](sf::Time dt)
             {
-                for (std::size_t i = 0; i < 10; i++)
-                    NWorld::createActor<EActor>()->setPosition(NWorld::getMousePositionView() + 10.f * NVector::UpVector());
-                std::cout << "added2" << std::endl;
+                NWorld::save("t.xml");
+                std::cout << "saved" << std::endl;
+            });
+
+            mController.setAction("d",sf::Mouse::Middle,NAction::Pressed);
+            mController.bind("d",[&](sf::Time dt)
+            {
+                std::size_t size = NWorld::getActorCount();
+                for (std::size_t i = 0; i < size; i++)
+                {
+                    NActor::Ptr a = NWorld::getActor(i);
+                }
             });
         }
 

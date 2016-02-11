@@ -10,6 +10,8 @@ class NActor : public NRootComponent
         NActor();
 
         typedef std::shared_ptr<NActor> Ptr;
+
+        virtual void save(pugi::xml_node& node);
 };
 
 #endif // NACTOR_HPP

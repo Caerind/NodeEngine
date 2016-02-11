@@ -9,6 +9,8 @@ class NRootComponent : public NComponent
     public:
         NRootComponent(NActor* actor);
 
+        virtual void save(pugi::xml_node& node);
+
     protected:
         NActor* mActor;
 };

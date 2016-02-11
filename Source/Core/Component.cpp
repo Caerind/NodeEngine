@@ -125,3 +125,7 @@ void NComponent::setActorRotation(float rotation)
         setRotation(rotation);
     }
 }
+
+void NComponent::save(pugi::xml_node& node)
+{
+}

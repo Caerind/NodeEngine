@@ -1,5 +1,4 @@
 #include "World.hpp"
-#include "../Application/Application.hpp"
 
 NWorld NWorld::mInstance;
 
@@ -124,6 +123,43 @@ void NWorld::removeActor(NActor::Ptr actor)
     mInstance.mActorsDeletions.add(actor);
 }
 
+NActor::Ptr NWorld::getActor(std::size_t index)
+{
+    if (index >= 0 && index < mInstance.mActors.size())
+    {
+        return mInstance.mActors[index];
+    }
+    return nullptr;
+}
+
+bool NWorld::load(std::string const& filename)
+{
+
+    return true;
+}
+
+bool NWorld::save(std::string const& filename)
+{
+    pugi::xml_document file;
+    pugi::xml_node actors = file.append_child("Actors");
+    std::size_t size = getActorCount();
+    for (std::size_t i = 0; i < size; i++)
+    {
+        pugi::xml_node actor = actors.append_child("Actor");
+        if (actor)
+        {
+            auto a = getActor(i);
+            if (a != nullptr)
+            {
+                a->NRootComponent::save(actor);
+                a->save(actor);
+            }
+        }
+    }
+    file.save_file(filename.c_str());
+    return true;
+}
+
 NCameraManager& NWorld::getCameraManager()
 {
     return mInstance.mCameraManager;
@@ -146,14 +182,23 @@ std::size_t NWorld::getTickableCount()
 
 NVector NWorld::getMousePositionScreen()
 {
-    return NVector::SFML2FToN(ah::Application::getWindow().getMousePosition());
+    return NVector::SFML2FToN(getWindow().getMousePosition());
 }
 
 NVector NWorld::getMousePositionView()
 {
-    return NVector::SFML2FToN(ah::Application::getWindow().getMousePositionView(mInstance.mCameraManager.getActiveView()));
+    return NVector::SFML2FToN(getWindow().getMousePositionView(mInstance.mCameraManager.getActiveView()));
 }
 
+ah::ResourceManager& NWorld::getResources()
+{
+    return ah::Application::getResources();
+}
+
+ah::Window& NWorld::getWindow()
+{
+    return ah::Application::getWindow();
+}
 
 void NWorld::addRenderable(NSceneComponent* renderable)
 {

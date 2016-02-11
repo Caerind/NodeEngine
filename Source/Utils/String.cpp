@@ -19,8 +19,8 @@ std::string split(std::string& base, char separator)
     std::size_t found = base.find(separator);
     if (found != std::string::npos)
     {
-        std::string t = base.substr(found + 1);
-        base = base.substr(0, found);
+        std::string t = base.substr(0, found);
+        base = base.substr(found + 1);
         return t;
     }
     return "";
@@ -31,8 +31,8 @@ std::string split(std::string& base, std::string const& separator)
     std::size_t found = base.find(separator);
     if (found != std::string::npos)
     {
-        std::string t = base.substr(found + 1);
-        base = base.substr(0, found);
+        std::string t = base.substr(0, found);
+        base = base.substr(found + 1);
         return t;
     }
     return "";

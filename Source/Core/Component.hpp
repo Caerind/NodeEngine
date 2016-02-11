@@ -2,6 +2,7 @@
 #define NCOMPONENT_HPP
 
 #include "../Utils/Array.hpp"
+#include "../Utils/Pugixml.hpp"
 
 #include "Tickable.hpp"
 #include "Transformable.hpp"
@@ -24,6 +25,8 @@ class NComponent : public NTickable, public NTransformable
         void setActorPosition(NVector const& position);
         void setActorScale(NVector const& scale);
         void setActorRotation(float rotation);
+
+        virtual void save(pugi::xml_node& node);
 
     protected:
         NArray<NComponent*> mComponents;

@@ -11,13 +11,21 @@ class NSpriteComponent : public NSceneComponent
     public:
         NSpriteComponent();
 
+        void setOrigin(NVector const& origin);
+        NVector getOrigin() const;
+
         void setTexture(sf::Texture& texture);
         void setTextureRect(sf::IntRect const& rect);
 
         void render(sf::RenderTarget& target);
 
+        bool contains(NVector const& position);
+
+        virtual void save(pugi::xml_node& node);
+
     private:
         sf::Sprite mSprite;
+        NVector mOrigin;
 };
 
 #endif // NSPRITECOMPONENT_HPP
