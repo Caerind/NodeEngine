@@ -13,7 +13,6 @@
 namespace ah
 {
 
-// TODO : ResourcePack
 class ResourceManager
 {
     public:

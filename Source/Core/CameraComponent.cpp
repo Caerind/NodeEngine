@@ -13,13 +13,18 @@ NCameraComponent::~NCameraComponent()
     NWorld::getCameraManager().removeCamera(this);
 }
 
-sf::View NCameraComponent::getView() const
+sf::View NCameraComponent::getView()
 {
+    mView.setCenter(NVector::NToSFML2F(getFinalPosition()));
     return mView;
 }
 
 void NCameraComponent::tick(sf::Time dt)
 {
-    mView.setCenter(NVector::NToSFML2F(getFinalPosition()));
-    mView.setRotation(getRotation());
+}
+
+void NCameraComponent::setRotation(float rotation)
+{
+    NComponent::setRotation(rotation);
+    mView.setRotation(rotation);
 }

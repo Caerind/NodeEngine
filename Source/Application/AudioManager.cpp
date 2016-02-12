@@ -1,5 +1,6 @@
 #include "AudioManager.hpp"
 #include "Application.hpp"
+#include "../Utils/Math.hpp"
 
 namespace ah
 {
@@ -427,8 +428,7 @@ Playlist::Playlist(std::vector<std::string> const& filenames, bool loop, sf::Vec
     mRandomPlayed = 0;
     if (mRandom)
     {
-        //mActualId = thor::random(0,static_cast<int>(mFilenames.size()-1));
-        mActualId = 0;
+        mActualId = NMath::random(0,(int)mFilenames.size()-1);
     }
     else
     {
@@ -469,8 +469,7 @@ void Playlist::update()
             mRandomPlayed++;
             if (mLoop || mRandomPlayed < mFilenames.size())
             {
-                //mActualId = thor::random(0,static_cast<int>(mFilenames.size()-1));
-                mActualId = (mActualId + 1) % (mFilenames.size());
+                mActualId = NMath::random(0,(int)mFilenames.size()-1);
                 mMusic.openFromFile(mFilenames[mActualId]);
                 play();
             }

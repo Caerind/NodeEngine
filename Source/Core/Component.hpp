@@ -18,10 +18,15 @@ class NComponent : public NTickable, public NTransformable
 
         float getFinalZ() const;
         NVector getFinalPosition() const;
+        sf::Transform getFinalTransform() const;
+
+        NVector getParentPosition() const;
+        NVector getParentScale() const;
+        float getParentRotation() const;
+
         NVector getActorPosition() const;
         NVector getActorScale() const;
         float getActorRotation() const;
-        sf::Transform getFinalTransform() const;
 
         void setActorPosition(NVector const& position);
         void setActorScale(NVector const& scale);

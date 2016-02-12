@@ -42,6 +42,54 @@ NVector NComponent::getFinalPosition() const
     return v;
 }
 
+sf::Transform NComponent::getFinalTransform() const
+{
+    if (mParent != nullptr)
+    {
+        return mParent->getFinalTransform() * getTransform();
+    }
+    else
+    {
+        return getTransform();
+    }
+}
+
+NVector NComponent::getParentPosition() const
+{
+    if (mParent != nullptr)
+    {
+        return mParent->getPosition();
+    }
+    else
+    {
+        return NVector();
+    }
+}
+
+NVector NComponent::getParentScale() const
+{
+    if (mParent != nullptr)
+    {
+        return mParent->getScale();
+    }
+    else
+    {
+        return NVector();
+    }
+}
+
+float NComponent::getParentRotation() const
+{
+    if (mParent != nullptr)
+    {
+        return mParent->getRotation();
+    }
+    else
+    {
+        return 0.f;
+    }
+}
+
 NVector NComponent::getActorPosition() const
 {
     if (mParent != nullptr)
@@ -75,18 +123,6 @@ float NComponent::getActorRotation() const
     else
     {
         return getRotation();
-    }
-}
-
-sf::Transform NComponent::getFinalTransform() const
-{
-    if (mParent != nullptr)
-    {
-        return mParent->getFinalTransform() * getTransform();
-    }
-    else
-    {
-        return getTransform();
     }
 }
 

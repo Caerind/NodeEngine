@@ -43,6 +43,23 @@ void NWorld::tick(sf::Time dt)
     {
         (*itr)->tick(dt);
     }
+
+    for (auto itr = mInstance.mTimers.begin(); itr != mInstance.mTimers.end();)
+    {
+        itr->second.first -= dt;
+        if (itr->second.first <= sf::Time::Zero)
+        {
+            if (itr->second.second)
+            {
+                itr->second.second();
+            }
+            itr = mInstance.mTimers.erase(itr);
+        }
+        else
+        {
+            itr++;
+        }
+    }
 }
 
 void NWorld::render(sf::RenderTarget& target)
@@ -111,16 +128,6 @@ void NWorld::update()
         mInstance.mActors.add(mInstance.mActorsAdditions[i]);
     }
     mInstance.mActorsAdditions.clear();
-    for (std::size_t i = 0; i < mInstance.mActorsDeletions.size(); i++)
-    {
-        mInstance.mActors.remove(mInstance.mActorsDeletions[i]);
-    }
-    mInstance.mActorsDeletions.clear();
-}
-
-void NWorld::removeActor(NActor::Ptr actor)
-{
-    mInstance.mActorsDeletions.add(actor);
 }
 
 NActor::Ptr NWorld::getActor(std::size_t index)
@@ -130,6 +137,30 @@ NActor::Ptr NWorld::getActor(std::size_t index)
         return mInstance.mActors[index];
     }
     return nullptr;
+}
+
+NActor::Ptr NWorld::getActor(std::string const& id)
+{
+    std::size_t size = mInstance.mActors.size();
+    for (std::size_t i = 0; i < size; i++)
+    {
+        if (mInstance.mActors[i]->getId() == id)
+        {
+            return mInstance.mActors[i];
+        }
+    }
+    return nullptr;
+}
+
+void NWorld::removeActor(std::string const& id)
+{
+    for (std::size_t i = 0; i < mInstance.mActors.size(); i++)
+    {
+        if (mInstance.mActors[i]->getId() == id)
+        {
+            mInstance.mActors.erase(i);
+        }
+    }
 }
 
 bool NWorld::load(std::string const& filename)
@@ -219,6 +250,43 @@ ah::ResourceManager& NWorld::getResources()
 ah::Window& NWorld::getWindow()
 {
     return ah::Application::getWindow();
+}
+
+void NWorld::setTimer(std::string& handle, sf::Time duration, std::function<void()> function)
+{
+    static int x = 0; // assign value of 0 only once
+    x++;
+    handle = std::to_string(x);
+    mInstance.mTimers[handle].first = duration;
+    mInstance.mTimers[handle].second = function;
+}
+
+void NWorld::setTimer(sf::Time duration, std::function<void()> function)
+{
+    std::string s;
+    setTimer(s,duration,function);
+}
+
+sf::Time NWorld::getTimer(std::string const& handle)
+{
+    if (mInstance.mTimers.contains(handle))
+    {
+        return mInstance.mTimers[handle].first;
+    }
+    return sf::Time::Zero;
+}
+
+void NWorld::changeTimer(std::string const& handle, sf::Time newDuration)
+{
+    if (mInstance.mTimers.contains(handle))
+    {
+        mInstance.mTimers[handle].first = newDuration;
+    }
+}
+
+void NWorld::clearTimer(std::string const& handle)
+{
+    mInstance.mTimers.remove(handle);
 }
 
 void NWorld::addRenderable(NSceneComponent* renderable)

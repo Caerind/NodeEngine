@@ -6,8 +6,6 @@
 
 #include <SFML/Audio.hpp>
 
-//#include <Thor/Math.hpp>
-
 namespace ah
 {
 
@@ -52,8 +50,6 @@ class AudioManager
         float mSoundVolume;
 };
 
-
-// TODO : Inherit from to sf::SoundSource to store more data
 class AudioSource
 {
     public:

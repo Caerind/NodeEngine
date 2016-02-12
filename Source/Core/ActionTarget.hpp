@@ -18,8 +18,18 @@ class NActionTarget : public NActionMap, public NTickable
 
         void tick(sf::Time dt);
 
+        template <typename ... Args>
+        void bind(std::string const& id, ActionCallback function, Args&& ... args);
+
     protected:
         NMap<std::string,ActionCallback> mFunctions;
 };
+
+template <typename ... Args>
+void NActionTarget::bind(std::string const& id, NActionTarget::ActionCallback function, Args&& ... args)
+{
+    setAction(id,std::forward<Args>(args)...);
+    bind(id,function);
+}
 
 #endif // NACTIONTARGET_HPP

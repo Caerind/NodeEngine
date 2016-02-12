@@ -13,6 +13,11 @@ class NActor : public NRootComponent
 
         virtual void load(pugi::xml_node& node);
         virtual void save(pugi::xml_node& node);
+
+        std::string getId() const;
+
+    protected:
+        std::string mId;
 };
 
 #endif // NACTOR_HPP

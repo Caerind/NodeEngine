@@ -52,26 +52,22 @@ class TestActor : public NActor
             mSpriteComponent.setTexture("icon");
             mSpriteComponent.setOrigin(64,64);
 
-            mInputComponent.setAction("mp",sf::Keyboard::A);
-            mInputComponent.setAction("mm",sf::Keyboard::Z);
-            mInputComponent.setAction("rp",sf::Keyboard::E);
-            mInputComponent.setAction("rm",sf::Keyboard::R);
             mInputComponent.bind("mp",[&](sf::Time dt)
             {
                 mSpriteComponent.setPosition(mSpriteComponent.getPosition() + 90 * dt.asSeconds() * NVector::RightVector());
-            });
+            },sf::Keyboard::A);
             mInputComponent.bind("mm",[&](sf::Time dt)
             {
                 mSpriteComponent.setPosition(mSpriteComponent.getPosition() - 90 * dt.asSeconds() * NVector::RightVector());
-            });
+            },sf::Keyboard::Z);
             mInputComponent.bind("rp",[&](sf::Time dt)
             {
-                mInputComponent.setActorRotation(mInputComponent.getActorRotation() + 180 * dt.asSeconds());
-            });
+                setRotation(getRotation() + 180 * dt.asSeconds());
+            },sf::Keyboard::E);
             mInputComponent.bind("rm",[&](sf::Time dt)
             {
-                mInputComponent.setActorRotation(mInputComponent.getActorRotation() - 180 * dt.asSeconds());
-            });
+                setRotation(getRotation() - 180 * dt.asSeconds());
+            },sf::Keyboard::R);
         }
 
         void load(pugi::xml_node& node)
@@ -110,26 +106,26 @@ class EState : public ah::State
                 NLog::log("failed to load");
             }
 
-            mController.setAction("c",sf::Mouse::Left,NAction::Pressed);
             mController.bind("c",[&](sf::Time dt)
             {
-                NWorld::createActor<EActor>()->setPosition(NWorld::getMousePositionView() - 10.f * NVector::UpVector());
-                NLog::log("added");
-            });
-
-            // TODO : test remove actor
-            mController.setAction("r",sf::Mouse::Middle,NAction::Pressed);
-            mController.bind("r",[&](sf::Time dt)
-            {
-                std::size_t size = NWorld::getActorCount();
-                for (std::size_t i = 0; i < size; i++)
+                EActor::Ptr e = NWorld::createActor<EActor>();
+                std::string id;
+                if (e != nullptr)
                 {
-                    NActor::Ptr a = NWorld::getActor(i);
+                    e->setPosition(NWorld::getMousePositionView() - 10.f * NVector::UpVector());
+                    id = e->getId();
                 }
-            });
 
-            mController.setAction("quit",sf::Event::Closed);
-            mController.bind("quit",[&](sf::Time dt){NWorld::save("t.xml");NLog::log("saved");});
+                NWorld::setTimer(sf::seconds(2.f),[id]()
+                {
+                    NWorld::removeActor(id);
+                    NLog::log("removed");
+                });
+
+                NLog::log("added");
+            },sf::Mouse::Left,NAction::Pressed);
+
+            mController.bind("quit",[&](sf::Time dt){NWorld::save("t.xml");NLog::log("saved");},sf::Event::Closed);
         }
 
         bool handleEvent(sf::Event const& event)
