@@ -3,6 +3,7 @@
 
 #include "../Utils/Array.hpp"
 #include "../Utils/Pugixml.hpp"
+#include "../Utils/String.hpp"
 
 #include "Tickable.hpp"
 #include "Transformable.hpp"

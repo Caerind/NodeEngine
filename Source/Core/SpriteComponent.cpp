@@ -1,6 +1,7 @@
 #include "SpriteComponent.hpp"
+#include "World.hpp"
 
-NSpriteComponent::NSpriteComponent()
+NSpriteComponent::NSpriteComponent() : mTexture("")
 {
 }
 
@@ -20,9 +21,19 @@ NVector NSpriteComponent::getOrigin() const
     return NVector::SFML2FToN(mSprite.getOrigin());
 }
 
-void NSpriteComponent::setTexture(sf::Texture& texture)
+void NSpriteComponent::setTexture(std::string const& textureName, sf::IntRect const& rect)
+{
+    setTexture(NWorld::getResources().getTexture(textureName),rect);
+    mTexture = textureName;
+}
+
+void NSpriteComponent::setTexture(sf::Texture& texture, sf::IntRect const& rect)
 {
     mSprite.setTexture(texture);
+    if (rect != sf::IntRect())
+    {
+        setTextureRect(rect);
+    }
 }
 
 void NSpriteComponent::setTextureRect(sf::IntRect const& rect)
@@ -37,27 +48,41 @@ void NSpriteComponent::render(sf::RenderTarget& target)
     target.draw(mSprite,states);
 }
 
-bool NSpriteComponent::contains(NVector const& position)
+sf::FloatRect NSpriteComponent::getBounds() const
 {
-    sf::FloatRect r = mSprite.getLocalBounds();
-    r = getFinalTransform().transformRect(r);
-    return r.contains(NVector::NToSFML2F(position));
+    return getFinalTransform().transformRect(mSprite.getLocalBounds());
+}
+
+bool NSpriteComponent::contains(NVector const& position) const
+{
+    return getBounds().contains(NVector::NToSFML2F(position));
 }
 
 void NSpriteComponent::load(pugi::xml_node& node, std::string const& name)
 {
     pugi::xml_node n = node.child(name.c_str());
-    setPosition(NVector::fromString(n.attribute("pos").value()));
-    setScale(NVector::fromString(n.attribute("sca").value()));
+    pugi::xml_attribute texture = n.attribute("texture");
+    if (texture)
+    {
+        setTexture(texture.value());
+        setTextureRect(NString::toIntRect(n.attribute("rect").value()));
+    }
+    setPosition(NString::toVector(n.attribute("pos").value()));
+    setScale(NString::toVector(n.attribute("sca").value()));
     setRotation(n.attribute("rot").as_float());
-    setOrigin(NVector::fromString(n.attribute("ori").value()));
+    setOrigin(NString::toVector(n.attribute("ori").value()));
 }
 
 void NSpriteComponent::save(pugi::xml_node& node, std::string const& name)
 {
     pugi::xml_node n = node.append_child(name.c_str());
-    n.append_attribute("pos") = NVector::toString(getPosition()).c_str();
-    n.append_attribute("sca") = NVector::toString(getScale()).c_str();
+    if (mTexture != "")
+    {
+        n.append_attribute("texture") = mTexture.c_str();
+        n.append_attribute("rect") = NString::toString(mSprite.getTextureRect()).c_str();
+    }
+    n.append_attribute("pos") = NString::toString(getPosition()).c_str();
+    n.append_attribute("sca") = NString::toString(getScale()).c_str();
     n.append_attribute("rot") = getRotation();
-    n.append_attribute("ori") = NVector::toString(mOrigin).c_str();
+    n.append_attribute("ori") = NString::toString(mOrigin).c_str();
 }

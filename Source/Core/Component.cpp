@@ -129,15 +129,15 @@ void NComponent::setActorRotation(float rotation)
 void NComponent::load(pugi::xml_node& node, std::string const& name)
 {
     pugi::xml_node n = node.child(name.c_str());
-    setPosition(NVector::fromString(n.attribute("pos").value()));
-    setScale(NVector::fromString(n.attribute("sca").value()));
+    setPosition(NString::toVector(n.attribute("pos").value()));
+    setScale(NString::toVector(n.attribute("sca").value()));
     setRotation(n.attribute("rot").as_float());
 }
 
 void NComponent::save(pugi::xml_node& node, std::string const& name)
 {
     pugi::xml_node n = node.append_child(name.c_str());
-    n.append_attribute("pos") = NVector::toString(getPosition()).c_str();
-    n.append_attribute("sca") = NVector::toString(getScale()).c_str();
+    n.append_attribute("pos") = NString::toString(getPosition()).c_str();
+    n.append_attribute("sca") = NString::toString(getScale()).c_str();
     n.append_attribute("rot") = getRotation();
 }

@@ -74,7 +74,6 @@ class NWorld
         void addTickable(NTickable* tickable);
         void removeTickable(NTickable* tickable);
 
-
     private:
         NWorld();
         ~NWorld();

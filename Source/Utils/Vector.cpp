@@ -136,22 +136,6 @@ NVector NVector::SFML3FToN(sf::Vector3f const& v)
     return NVector(v.x,v.y,v.z);
 }
 
-std::string NVector::toString(NVector const& v)
-{
-    std::string s;
-    s += std::to_string(v.x) + "," + std::to_string(v.y) + "," + std::to_string(v.z);
-    return s;
-}
-
-NVector NVector::fromString(std::string s)
-{
-    NVector v;
-    v.x = std::stof(NString::split(s,","));
-    v.y = std::stof(NString::split(s,","));
-    v.z = std::stof(s);
-    return v;
-}
-
 // Operators
 NVector operator +(NVector const& left, NVector const& right)
 {

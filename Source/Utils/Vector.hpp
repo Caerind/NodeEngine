@@ -4,7 +4,6 @@
 #include <cmath>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
-#include "String.hpp"
 
 class NVector
 {
@@ -47,9 +46,6 @@ class NVector
         static NVector SFML2FToN(sf::Vector2f const& v, float z = 0.f);
         static NVector SFML2IToN(sf::Vector2i const& v, float z = 0.f);
         static NVector SFML3FToN(sf::Vector3f const& v);
-
-        static std::string toString(NVector const& v);
-        static NVector fromString(std::string s);
 };
 
 // Operators

@@ -2,8 +2,12 @@
 #define NSTRING_HPP_INCLUDED
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <typeinfo>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include "Vector.hpp"
 
 namespace NString
 {
@@ -49,6 +53,15 @@ std::string split(std::string& base, std::string const& separator);
 
 bool contains(std::string const& str, char c);
 bool contains(std::string const& str, std::string const& c);
+
+std::string toString(sf::FloatRect const& rect);
+std::string toString(sf::IntRect const& rect);
+std::string toString(sf::Color const& color);
+std::string toString(NVector const& v);
+sf::FloatRect toFloatRect(std::string str);
+sf::IntRect toIntRect(std::string str);
+sf::Color toColor(std::string str);
+NVector toVector(std::string str);
 
 } // namespace NString
 
