@@ -66,7 +66,7 @@ class StateManager
 template<typename T>
 void StateManager::registerState()
 {
-    std::string t = NString::Type<T>();
+    std::string t = NString::type<T>();
 	mFactories[t] = [this] ()
 	{
 		return State::Ptr(new T(*this));
@@ -76,7 +76,7 @@ void StateManager::registerState()
 template <typename T>
 void StateManager::pushState()
 {
-	mPendingList.push_back(PendingChange(Push, NString::Type<T>()));
+	mPendingList.push_back(PendingChange(Push, NString::type<T>()));
 }
 
 } // namespace ah

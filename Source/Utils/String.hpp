@@ -35,7 +35,7 @@ std::string readable_name( const char* mangled_name ) { return mangled_name ; }
 // Code found here : http://www.cplusplus.com/forum/beginner/100627/
 // Thanks to http://www.cplusplus.com/user/JLBorges/ for this
 
-template < typename T > std::string Type()
+template < typename T > std::string type()
 { return readable_name( typeid(T).name() ) ; }
 
 template < typename T > std::string Type( const T& obj )

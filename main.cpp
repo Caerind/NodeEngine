@@ -7,6 +7,7 @@
 #include "Source/Core/SpriteComponent.hpp"
 #include "Source/Core/InputComponent.hpp"
 #include "Source/Core/CameraComponent.hpp"
+#include "Source/Core/PointComponent.hpp"
 
 class EActor : public NActor
 {
@@ -14,6 +15,7 @@ class EActor : public NActor
         EActor()
         {
             mSpriteComponent.setTexture(ah::Application::getResources().getTexture("icon"));
+            mSpriteComponent.setOrigin(64,64);
             attachComponent(&mSpriteComponent);
         }
 
@@ -22,10 +24,15 @@ class EActor : public NActor
             return mSpriteComponent.contains(position);
         }
 
+        void load(pugi::xml_node& node)
+        {
+            mSpriteComponent.load(node,"SpriteC");
+        }
+
         void save(pugi::xml_node& node)
         {
-            pugi::xml_node n = node.append_child("Sprite");
-            mSpriteComponent.save(n);
+            node.append_attribute("type") = "EActor";
+            mSpriteComponent.save(node,"SpriteC");
         }
 
         NSpriteComponent mSpriteComponent;
@@ -36,38 +43,53 @@ class TestActor : public NActor
     public:
         TestActor()
         {
-            setPosition(400,300);
+            attachComponent(&mPointComponent);
 
             mSpriteComponent.setTexture(ah::Application::getResources().getTexture("icon"));
+            mSpriteComponent.setOrigin(64,64);
             attachComponent(&mSpriteComponent);
 
-            mSpriteComponent.attachComponent(&mCameraComponent);
+            attachComponent(&mCameraComponent);
 
-            mInputComponent.setAction("m+",sf::Keyboard::D);
-            mInputComponent.bind("m+",[&](sf::Time dt)
+            mInputComponent.setAction("mp",sf::Keyboard::D);
+            mInputComponent.bind("mp",[&](sf::Time dt)
             {
                 mSpriteComponent.setPosition(mSpriteComponent.getPosition() + 90 * dt.asSeconds() * NVector::RightVector());
             });
-            mInputComponent.setAction("m-",sf::Keyboard::Q);
-            mInputComponent.bind("m-",[&](sf::Time dt)
+            mInputComponent.setAction("mm",sf::Keyboard::Q);
+            mInputComponent.bind("mm",[&](sf::Time dt)
             {
                 mSpriteComponent.setPosition(mSpriteComponent.getPosition() - 90 * dt.asSeconds() * NVector::RightVector());
             });
 
-            mInputComponent.setAction("r+",sf::Keyboard::Z);
-            mInputComponent.bind("r+",[&](sf::Time dt)
+            mInputComponent.setAction("rp",sf::Keyboard::Z);
+            mInputComponent.bind("rp",[&](sf::Time dt)
             {
                 mInputComponent.setActorRotation(mInputComponent.getActorRotation() + 180 * dt.asSeconds());
             });
-            mInputComponent.setAction("r-",sf::Keyboard::S);
-            mInputComponent.bind("r-",[&](sf::Time dt)
+            mInputComponent.setAction("rm",sf::Keyboard::S);
+            mInputComponent.bind("rm",[&](sf::Time dt)
             {
                 mInputComponent.setActorRotation(mInputComponent.getActorRotation() - 180 * dt.asSeconds());
             });
             attachComponent(&mInputComponent);
         }
 
+        void load(pugi::xml_node& node)
+        {
+            mSpriteComponent.load(node,"Sprite");
+            mInputComponent.load(node,"Input");
+        }
+
+        void save(pugi::xml_node& node)
+        {
+            node.append_attribute("type") = "TestActor";
+            mSpriteComponent.save(node,"Sprite");
+            mInputComponent.save(node,"Input");
+        }
+
     private:
+        NPointComponent mPointComponent;
         NInputComponent mInputComponent;
         NSpriteComponent mSpriteComponent;
         NCameraComponent mCameraComponent;
@@ -78,7 +100,17 @@ class EState : public ah::State
     public:
         EState(ah::StateManager& manager) : ah::State(manager)
         {
-            mPlayer = NWorld::createActor<TestActor>();
+            NWorld::registerActor<TestActor>();
+            NWorld::registerActor<EActor>();
+
+            //mPlayer = NWorld::createActor<TestActor>();
+            //mPlayer->setPosition(400,300);
+
+            if (!NWorld::load("t.xml"))
+            {
+                NLog::log("failed");
+            }
+
             mController.setAction("c1",sf::Mouse::Left,NAction::Pressed);
             mController.bind("c1",[&](sf::Time dt)
             {
@@ -126,7 +158,7 @@ class EState : public ah::State
         }
 
     private:
-        TestActor::Ptr mPlayer;
+        //TestActor::Ptr mPlayer;
         NActionTarget mController;
 };
 

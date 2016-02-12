@@ -9,7 +9,8 @@ class NRootComponent : public NComponent
     public:
         NRootComponent(NActor* actor);
 
-        virtual void save(pugi::xml_node& node);
+        virtual void load(pugi::xml_node& node, std::string const& name = "");
+        virtual void save(pugi::xml_node& node, std::string const& name = "");
 
     protected:
         NActor* mActor;

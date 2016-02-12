@@ -18,7 +18,7 @@ class NActionTarget : public NActionMap, public NTickable
 
         void tick(sf::Time dt);
 
-    private:
+    protected:
         NMap<std::string,ActionCallback> mFunctions;
 };
 

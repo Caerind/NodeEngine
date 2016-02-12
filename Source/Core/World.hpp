@@ -11,6 +11,7 @@
 #include "SceneComponent.hpp"
 
 #include "../Utils/Array.hpp"
+#include "../Utils/Map.hpp"
 #include "../Utils/Pugixml.hpp"
 
 #include "../Application/Application.hpp"
@@ -35,6 +36,9 @@ class NWorld
 
         // Update the world : use temp array and then clear them
         static void update();
+
+        template<typename T>
+        static bool registerActor();
 
         template <typename T>
         static std::shared_ptr<T> createActor();
@@ -70,6 +74,7 @@ class NWorld
         void addTickable(NTickable* tickable);
         void removeTickable(NTickable* tickable);
 
+
     private:
         NWorld();
         ~NWorld();
@@ -92,6 +97,8 @@ class NWorld
         NArray<NTickable*> mTickablesDeletions;
 
         NCameraManager mCameraManager;
+
+        NMap<std::string,std::function<NActor::Ptr()>> mActorFactory;
 };
 
 template <typename T>
@@ -100,6 +107,17 @@ std::shared_ptr<T> NWorld::createActor()
     std::shared_ptr<T> actor = std::make_shared<T>();
     mInstance.mActorsAdditions.add(actor);
     return actor;
+}
+
+template<typename T>
+bool NWorld::registerActor()
+{
+    std::string t = NString::type<T>();
+	mInstance.mActorFactory[t] = [] ()
+	{
+		return NActor::Ptr(new T());
+	};
+	return true;
 }
 
 #endif // NWORLD_HPP

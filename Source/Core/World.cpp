@@ -134,14 +134,35 @@ NActor::Ptr NWorld::getActor(std::size_t index)
 
 bool NWorld::load(std::string const& filename)
 {
+    pugi::xml_document doc;
+    if (!doc.load_file(filename.c_str()))
+    {
+        return false;
+    }
+    pugi::xml_node actors = doc.child("Actors");
+    if (!actors)
+    {
+        return false;
+    }
+    for (pugi::xml_node actor = actors.first_child(); actor; actor = actor.next_sibling())
+    {
+        std::string type = actor.attribute("type").value();
+        if (mInstance.mActorFactory.contains(type))
+        {
+            auto a = mInstance.mActorFactory[type]();
+            a->load(actor);
+            a->NRootComponent::load(actor);
+            mInstance.mActorsAdditions.add(a);
+        }
+    }
 
     return true;
 }
 
 bool NWorld::save(std::string const& filename)
 {
-    pugi::xml_document file;
-    pugi::xml_node actors = file.append_child("Actors");
+    pugi::xml_document doc;
+    pugi::xml_node actors = doc.append_child("Actors");
     std::size_t size = getActorCount();
     for (std::size_t i = 0; i < size; i++)
     {
@@ -151,12 +172,12 @@ bool NWorld::save(std::string const& filename)
             auto a = getActor(i);
             if (a != nullptr)
             {
-                a->NRootComponent::save(actor);
                 a->save(actor);
+                a->NRootComponent::save(actor);
             }
         }
     }
-    file.save_file(filename.c_str());
+    doc.save_file(filename.c_str());
     return true;
 }
 

@@ -77,7 +77,7 @@ template <typename T>
 ResourceManager::Resource ResourceManager::ResourceHolder<T>::load(std::string const& id, std::string const& filename)
 {
     Resource r;
-    r.type = NString::Type<T>();
+    r.type = NString::type<T>();
     r.id = id;
     r.filename = filename;
     resources[r.id].first = r;

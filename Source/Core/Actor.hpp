@@ -11,6 +11,7 @@ class NActor : public NRootComponent
 
         typedef std::shared_ptr<NActor> Ptr;
 
+        virtual void load(pugi::xml_node& node);
         virtual void save(pugi::xml_node& node);
 };
 

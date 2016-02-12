@@ -40,7 +40,10 @@ class NAction
         bool operator==(sf::Event const& event) const;
         bool operator==(NAction const& action) const;
 
-        // TODO : Static functions to convert keys/buttons to strings
+        static std::string keyToString(sf::Keyboard::Key const& key);
+        static std::string mouseButtonToString(sf::Mouse::Button const& button);
+        static sf::Keyboard::Key stringToKey(std::string const& str);
+        static sf::Mouse::Button stringToMouseButton(std::string const& str);
 
     protected:
         sf::Event mEvent;

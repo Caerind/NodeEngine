@@ -11,6 +11,7 @@ class NSpriteComponent : public NSceneComponent
     public:
         NSpriteComponent();
 
+        void setOrigin(float x, float y, float z = 0.f);
         void setOrigin(NVector const& origin);
         NVector getOrigin() const;
 
@@ -21,7 +22,8 @@ class NSpriteComponent : public NSceneComponent
 
         bool contains(NVector const& position);
 
-        virtual void save(pugi::xml_node& node);
+        virtual void load(pugi::xml_node& node, std::string const& name = "SpriteComponent");
+        virtual void save(pugi::xml_node& node, std::string const& name = "SpriteComponent");
 
     private:
         sf::Sprite mSprite;

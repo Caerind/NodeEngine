@@ -26,7 +26,8 @@ class NComponent : public NTickable, public NTransformable
         void setActorScale(NVector const& scale);
         void setActorRotation(float rotation);
 
-        virtual void save(pugi::xml_node& node);
+        virtual void load(pugi::xml_node& node, std::string const& name = "Component");
+        virtual void save(pugi::xml_node& node, std::string const& name = "Component");
 
     protected:
         NArray<NComponent*> mComponents;
