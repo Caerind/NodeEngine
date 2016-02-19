@@ -5,11 +5,14 @@
 #include <functional>
 #include <vector>
 
+#include "Math.hpp"
+
 template <typename T>
 class NArray : public std::vector<T>
 {
     public:
         NArray();
+        NArray(std::vector<T> const& vector);
 
         void sort(std::function<bool(T const& a, T const& b)> function);
 
@@ -20,11 +23,21 @@ class NArray : public std::vector<T>
         void append(std::vector<T> const& vector);
 
         void erase(std::size_t index);
+
+        bool contains(T const& element);
+
+        T randomElement();
 };
 
 template <typename T>
 NArray<T>::NArray()
 {
+}
+
+template <typename T>
+NArray<T>::NArray(std::vector<T> const& vector)
+{
+    append(vector);
 }
 
 template <typename T>
@@ -78,6 +91,18 @@ void NArray<T>::erase(std::size_t index)
     {
         std::vector<T>::erase(std::vector<T>::begin() + index);
     }
+}
+
+template <typename T>
+bool NArray<T>::contains(T const& element)
+{
+    return std::find(std::vector<T>::begin(),std::vector<T>::end(),element) != std::vector<T>::end();
+}
+
+template <typename T>
+T NArray<T>::randomElement()
+{
+    return std::vector<T>::at(NMath::random(0,(int)std::vector<T>::size()-1));
 }
 
 #endif // NARRAY_HPP

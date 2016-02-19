@@ -90,11 +90,45 @@ class TestActor : public NActor
         NCameraComponent mCameraComponent;
 };
 
+class GState : public ah::State
+{
+    public:
+        GState(ah::StateManager& manager) : ah::State(manager)
+        {
+            mSprite.setTexture(NWorld::getResources().getTexture("icon"));
+            mSprite.setScale(4.f,2.f);
+            mSprite.setOrigin(mSprite.getGlobalBounds().width / 2.f, mSprite.getGlobalBounds().height / 2.f);
+            mSprite.setPosition((sf::Vector2f)NWorld::getWindow().getSize() * 0.5f);
+            NLog::log("t " + std::to_string(mSprite.getPosition().x));
+        }
+
+        bool handleEvent(sf::Event const& event)
+        {
+            return true;
+        }
+
+        bool update(sf::Time dt)
+        {
+            return true;
+        }
+
+        void render(sf::RenderTarget& target, sf::RenderStates)
+        {
+            target.setView(target.getDefaultView());
+            target.draw(mSprite);
+        }
+
+    private:
+        sf::Sprite mSprite;
+};
+
 class EState : public ah::State
 {
     public:
         EState(ah::StateManager& manager) : ah::State(manager)
         {
+            mGuiOpened = false;
+
             NWorld::registerActor<TestActor>();
             NWorld::registerActor<EActor>();
 
@@ -126,6 +160,19 @@ class EState : public ah::State
             },sf::Mouse::Left,NAction::Pressed);
 
             mController.bind("quit",[&](sf::Time dt){NWorld::save("t.xml");NLog::log("saved");},sf::Event::Closed);
+
+            mController.bind("gui",[&](sf::Time dt)
+            {
+                mGuiOpened = !mGuiOpened;
+                if (mGuiOpened)
+                {
+                    requestPush(NString::type<GState>());
+                }
+                else
+                {
+                    requestPop();
+                }
+            },sf::Keyboard::E,NAction::Pressed);
         }
 
         bool handleEvent(sf::Event const& event)
@@ -152,6 +199,8 @@ class EState : public ah::State
     private:
         //TestActor::Ptr mPlayer;
         NActionTarget mController;
+
+        bool mGuiOpened;
 };
 
 int main()
@@ -163,6 +212,7 @@ int main()
     ah::Application::getWindow().setDebugInfoFont("sansation.ttf");
 
     ah::Application::getStates().registerState<EState>();
+    ah::Application::getStates().registerState<GState>();
     ah::Application::getStates().pushState<EState>();
 
     ah::Application::run();

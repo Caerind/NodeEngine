@@ -13,6 +13,7 @@
 #include "../Utils/Array.hpp"
 #include "../Utils/Map.hpp"
 #include "../Utils/Pugixml.hpp"
+#include "../Utils/Timer.hpp"
 
 #include "../Application/Application.hpp"
 
@@ -69,11 +70,11 @@ class NWorld
         static ah::ResourceManager& getResources();
         static ah::Window& getWindow();
 
-        static void setTimer(std::string& handle, sf::Time duration, std::function<void()> function);
-        static void setTimer(sf::Time duration, std::function<void()> function);
-        static sf::Time getTimer(std::string const& handle);
-        static void changeTimer(std::string const& handle, sf::Time newDuration);
-        static void clearTimer(std::string const& handle);
+        static std::string setTimer(sf::Time duration, NTimer::Callback function = [](){});
+        static sf::Time getTimerRemaining(std::string const& handle);
+        static sf::Time getTimerDuration(std::string const& handle);
+        static void resetTimer(std::string const& handle, sf::Time newDuration);
+        static void stopTimer(std::string const& handle);
 
         /* These following arent static cause they shouldn't be use directly */
         void addRenderable(NSceneComponent* renderable);
@@ -102,7 +103,7 @@ class NWorld
         NArray<NTickable*> mTickablesAdditions;
         NArray<NTickable*> mTickablesDeletions;
 
-        NMap<std::string,std::pair<sf::Time,std::function<void()>>> mTimers;
+        NMap<std::string,NTimer> mTimers;
 
         NCameraManager mCameraManager;
 

@@ -32,7 +32,6 @@ void NInputComponent::load(pugi::xml_node& node, std::string const& name)
 void NInputComponent::save(pugi::xml_node& node, std::string const& name)
 {
     pugi::xml_node n = node.append_child(name.c_str());
-    std::size_t size = mActions.size();
     for (auto itr = mActions.begin(); itr != mActions.end(); itr++)
     {
         if (itr->second.isMouseAction())

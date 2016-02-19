@@ -7,7 +7,8 @@
 namespace NTime
 {
 
-std::string getTime(std::string const& timeFormat);
+std::string getTime(std::string const& timeFormat = "[%x][%X]");
+double getTimeAsSeconds();
 
 int getHours();
 int getMinutes();

@@ -5,8 +5,10 @@
 #include <algorithm>
 #include <string>
 #include <typeinfo>
+
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Color.hpp>
+
 #include "Vector.hpp"
 
 namespace NString
@@ -50,9 +52,12 @@ void toUpper(std::string& str);
 
 std::string split(std::string& base, char separator);
 std::string split(std::string& base, std::string const& separator);
+std::vector<std::string> splitVector(std::string str, std::string const& separator);
 
 bool contains(std::string const& str, char c);
 bool contains(std::string const& str, std::string const& c);
+
+std::string limitSize(std::string str, std::size_t size);
 
 std::string toString(sf::FloatRect const& rect);
 std::string toString(sf::IntRect const& rect);

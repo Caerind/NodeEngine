@@ -44,21 +44,9 @@ void NWorld::tick(sf::Time dt)
         (*itr)->tick(dt);
     }
 
-    for (auto itr = mInstance.mTimers.begin(); itr != mInstance.mTimers.end();)
+    for (auto itr = mInstance.mTimers.begin(); itr != mInstance.mTimers.end(); itr++)
     {
-        itr->second.first -= dt;
-        if (itr->second.first <= sf::Time::Zero)
-        {
-            if (itr->second.second)
-            {
-                itr->second.second();
-            }
-            itr = mInstance.mTimers.erase(itr);
-        }
-        else
-        {
-            itr++;
-        }
+        itr->second.update(dt);
     }
 }
 
@@ -252,39 +240,43 @@ ah::Window& NWorld::getWindow()
     return ah::Application::getWindow();
 }
 
-void NWorld::setTimer(std::string& handle, sf::Time duration, std::function<void()> function)
+std::string NWorld::setTimer(sf::Time duration, NTimer::Callback callback)
 {
-    static int x = 0; // assign value of 0 only once
+    static int x = 0;
     x++;
-    handle = std::to_string(x);
-    mInstance.mTimers[handle].first = duration;
-    mInstance.mTimers[handle].second = function;
+    std::string handle = std::to_string(x);
+    mInstance.mTimers[handle].setCallback(callback);
+    mInstance.mTimers[handle].reset(duration);
+    return handle;
 }
 
-void NWorld::setTimer(sf::Time duration, std::function<void()> function)
-{
-    std::string s;
-    setTimer(s,duration,function);
-}
-
-sf::Time NWorld::getTimer(std::string const& handle)
+sf::Time NWorld::getTimerRemaining(std::string const& handle)
 {
     if (mInstance.mTimers.contains(handle))
     {
-        return mInstance.mTimers[handle].first;
+        return mInstance.mTimers[handle].getRemaining();
     }
     return sf::Time::Zero;
 }
 
-void NWorld::changeTimer(std::string const& handle, sf::Time newDuration)
+sf::Time NWorld::getTimerDuration(std::string const& handle)
 {
     if (mInstance.mTimers.contains(handle))
     {
-        mInstance.mTimers[handle].first = newDuration;
+        return mInstance.mTimers[handle].getDuration();
+    }
+    return sf::Time::Zero;
+}
+
+void NWorld::resetTimer(std::string const& handle, sf::Time newDuration)
+{
+    if (mInstance.mTimers.contains(handle))
+    {
+        mInstance.mTimers[handle].reset(newDuration);
     }
 }
 
-void NWorld::clearTimer(std::string const& handle)
+void NWorld::stopTimer(std::string const& handle)
 {
     mInstance.mTimers.remove(handle);
 }
