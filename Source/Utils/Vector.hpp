@@ -12,10 +12,10 @@ class NVector
         float y;
         float z;
 
-        static const NVector UpVector(); // (0,0,1)
-        static const NVector RightVector(); // (0,1,0)
-        static const NVector ForwardVector(); // (1,0,0)
-        static const NVector ZeroVector(); // (0,0,0)
+        static NVector UpVector(); // (0,0,1)
+        static NVector RightVector(); // (0,1,0)
+        static NVector ForwardVector(); // (1,0,0)
+        static NVector ZeroVector(); // (0,0,0)
 
         NVector(); // (0,0,0)
         NVector(float value); // (value,value,value)
@@ -31,12 +31,23 @@ class NVector
 
         bool isNormalized() const;
         void normalize();
+        NVector unitVector() const;
 
         float size() const;
         float sizeSquared() const;
 
         float size2D() const;
         float sizeSquared2D() const;
+
+
+        // Polar2D
+        float getLength() const;
+        float getAngle() const;
+
+        void setLength(float length);
+        void setAngle(float angle);
+
+        void rotate(float angle);
 
 
         // Conversions

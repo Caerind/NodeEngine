@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <SFML/Window/Touch.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -74,6 +75,22 @@ class Window : public sf::RenderWindow
         sf::Vector2f getMousePositionView(sf::View const& view);
 
         //
+        // TOUCH
+        //
+        sf::Vector2i getTouchPosition2i(unsigned int touchIndex = 0) const;
+        sf::Vector2f getTouchPosition(unsigned int touchIndex = 0) const;
+        sf::Vector2f getTouchPositionMap(unsigned int touchIndex = 0) const;
+        sf::Vector2f getTouchPositionView(sf::View const& view, unsigned int touchIndex = 0);
+
+        //
+        // Pointer
+        //
+        sf::Vector2i getPointerPosition2i(unsigned int touchIndex = 0) const;
+        sf::Vector2f getPointerPosition(unsigned int touchIndex = 0) const;
+        sf::Vector2f getPointerPositionMap(unsigned int touchIndex = 0) const;
+        sf::Vector2f getPointerPositionView(sf::View const& view, unsigned int touchIndex = 0);
+
+        //
         // CURSOR
         //
         enum MouseCursor
@@ -119,9 +136,8 @@ class Window : public sf::RenderWindow
         //
         // LOADING/SAVING SETTINGS
         //
-        bool load();
-        void detect();
-        void save();
+        bool load(std::string const& filename);
+        void save(std::string const& filename);
 
         //
         // BACKGROUND

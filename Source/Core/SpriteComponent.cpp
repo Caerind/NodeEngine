@@ -41,6 +41,11 @@ void NSpriteComponent::setTextureRect(sf::IntRect const& rect)
     mSprite.setTextureRect(rect);
 }
 
+sf::IntRect NSpriteComponent::getTextureRect() const
+{
+    return mSprite.getTextureRect();
+}
+
 void NSpriteComponent::render(sf::RenderTarget& target)
 {
     sf::RenderStates states;
@@ -50,7 +55,10 @@ void NSpriteComponent::render(sf::RenderTarget& target)
 
 sf::FloatRect NSpriteComponent::getBounds() const
 {
-    return getFinalTransform().transformRect(mSprite.getLocalBounds());
+    sf::FloatRect r = getFinalTransform().transformRect(mSprite.getLocalBounds());
+    r.left -= getOrigin().x;
+    r.top -= getOrigin().y;
+    return r;
 }
 
 bool NSpriteComponent::contains(NVector const& position) const

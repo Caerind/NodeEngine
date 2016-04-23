@@ -4,11 +4,12 @@
 #include <functional>
 #include <map>
 #include <vector>
-
-#include "../Utils/String.hpp"
-#include "../Utils/Assume.hpp"
+#include <string>
+#include <cassert>
+#include <iostream>
 
 #include "State.hpp"
+#include "../Utils/String.hpp"
 
 namespace ah
 {
@@ -18,23 +19,27 @@ class StateManager
     public:
 		StateManager();
 
+		#ifdef N_DESKTOP_PLATFORM
 		template<typename T>
 		void registerState();
+
+		template<typename T>
+		void pushState();
+		#endif
+
+		template<typename T>
+		void registerState(std::string const& id);
 
         void handleEvent(sf::Event const& event);
 		void update(sf::Time dt);
 		void render(sf::RenderTarget& target, sf::RenderStates states);
 
-        template <typename T>
-		void pushState();
 		void pushState(std::string const& id);
 		void popState();
 		void clearStates();
 
 		bool empty() const;
 		std::size_t size() const;
-		std::string getActiveStateType() const;
-		std::string getLastActiveStateType() const;
 
 	protected:
 		enum Action
@@ -63,20 +68,30 @@ class StateManager
 		std::map<std::string, std::function<State::Ptr()>> mFactories;
 };
 
+#ifdef N_DESKTOP_PLATFORM
 template<typename T>
 void StateManager::registerState()
 {
-    std::string t = NString::type<T>();
-	mFactories[t] = [this] ()
+    mFactories[NString::type<T>()] = [this]()
+    {
+        return State::Ptr(new T(*this));
+    };
+}
+
+template<typename T>
+void StateManager::pushState()
+{
+    pushState(NString::type<T>());
+}
+#endif
+
+template<typename T>
+void StateManager::registerState(std::string const& id)
+{
+	mFactories[id] = [this]()
 	{
 		return State::Ptr(new T(*this));
 	};
-}
-
-template <typename T>
-void StateManager::pushState()
-{
-	mPendingList.push_back(PendingChange(Push, NString::type<T>()));
 }
 
 } // namespace ah

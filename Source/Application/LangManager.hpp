@@ -19,14 +19,16 @@ class LangManager
     public:
         LangManager();
 
-        bool setLang(std::string const& lang);
-        std::string getLang() const;
+        bool load(std::string const& path);
+
         std::vector<std::string> getLoadedLangs();
+        bool isLangLoaded(std::string const& lang);
+
+        bool setActualLang(std::string const& lang);
+        std::string getActualLang() const;
 
         void set(std::string const& id, std::string const& str);
         std::string get(std::string const& id) const;
-
-        bool load();
 
     protected:
         std::string mActualLang;

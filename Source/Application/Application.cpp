@@ -3,7 +3,16 @@
 namespace ah
 {
 
-Application Application::mInstance;
+Application* Application::mInstance = nullptr;
+
+Application& Application::instance()
+{
+    if (mInstance == nullptr)
+    {
+        mInstance = new Application();
+    }
+    return *mInstance;
+}
 
 void Application::run()
 {
@@ -12,8 +21,9 @@ void Application::run()
     sf::Time timePerFrame = sf::seconds(1/60.f);
     sf::Clock fpsClock;
     std::size_t fps = 0;
-    mInstance.mWindow.setDebugInfo("FPS","0");
-    while (mInstance.mWindow.isOpen())
+    instance().mWindow.setDebugInfo("FPS","0");
+    instance().mRunning = true;
+    while (instance().mRunning)
     {
         timeSinceLastUpdate += clock.restart();
 
@@ -22,73 +32,86 @@ void Application::run()
             timeSinceLastUpdate -= timePerFrame;
 
             sf::Event event;
-            while (mInstance.mWindow.pollEvent(event))
+            while (instance().mWindow.pollEvent(event))
             {
-                mInstance.mStates.handleEvent(event);
+                instance().mStates.handleEvent(event);
 
                 if (event.type == sf::Event::Closed)
                 {
-                    mInstance.mWindow.close();
+                    close();
                 }
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F3)
                 {
-                    mInstance.mWindow.showDebugInfo(!mInstance.mWindow.isDebugInfoVisible());
+                    instance().mWindow.showDebugInfo(!instance().mWindow.isDebugInfoVisible());
                 }
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2)
                 {
-                    mInstance.mWindow.screenshot();
+                    instance().mWindow.screenshot();
                 }
             }
 
-            mInstance.mStates.update(timePerFrame);
-            if (mInstance.mStates.empty())
+            instance().mStates.update(timePerFrame);
+            if (instance().mStates.empty())
             {
-                mInstance.mWindow.close();
+                close();
             }
-            mInstance.mAudio.update();
+            instance().mAudio.update();
         }
 
-        mInstance.mWindow.clear();
-        mInstance.mStates.render(mInstance.mWindow,sf::RenderStates());
-        mInstance.mWindow.display();
+        instance().mWindow.clear();
+        instance().mStates.render(instance().mWindow,sf::RenderStates());
+        instance().mWindow.display();
 
         fps++;
         if (fpsClock.getElapsedTime() >= sf::seconds(1.f))
         {
-            mInstance.mWindow.setDebugInfo("FPS",std::to_string(fps));
+            instance().mWindow.setDebugInfo("FPS",std::to_string(fps));
             fps = 0;
             fpsClock.restart();
         }
     }
+    instance().mWindow.close();
+}
+
+void Application::close()
+{
+    instance().mRunning = false;
+    instance().mAudio.stop();
 }
 
 StateManager& Application::getStates()
 {
-    return mInstance.mStates;
+    return instance().mStates;
 }
 
 Window& Application::getWindow()
 {
-    return mInstance.mWindow;
+    return instance().mWindow;
 }
 
 AudioManager& Application::getAudio()
 {
-    return mInstance.mAudio;
+    return instance().mAudio;
 }
 
 ResourceManager& Application::getResources()
 {
-    return mInstance.mResources;
+    return instance().mResources;
 }
 
 LangManager& Application::getLang()
 {
-    return mInstance.mLang;
+    return instance().mLang;
+}
+
+ValueContainer& Application::getValues()
+{
+    return instance().mValues;
 }
 
 Application::Application()
 {
+    mRunning = false;
 }
 
 Application::~Application()

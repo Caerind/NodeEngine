@@ -13,10 +13,15 @@ class NCameraManager
         void addCamera(NCameraComponent* camera);
         void removeCamera(NCameraComponent* camera);
 
-        sf::View getActiveView() const;
+        sf::View& getView();
+
+        sf::View& getActiveView();
+
+        void clear();
 
     protected:
         NArray<NCameraComponent*> mCameras;
+        sf::View mView;
         int mActive;
 };
 

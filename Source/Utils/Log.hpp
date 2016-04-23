@@ -5,9 +5,11 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <time.h>
+#include <SFML/Network/Http.hpp>
+#include <SFML/Network/IpAddress.hpp>
 
 #include "Time.hpp"
+#include "HttpThread.hpp"
 
 class NLog
 {
@@ -21,60 +23,50 @@ class NLog
             Info,
         };
 
-        static void setLogType(LogType type);
         static void log(std::string const& message);
+		static void onlineLog(std::string const& message);
 
         friend NLog& operator<<(NLog& log, std::string const& message)
         {
-            std::stringstream ss;
-            ss << NTime::getTime("[%x][%X]");
-            switch (log.mType)
-            {
-                case NLog::LogType::Error:
-                    ss << "[ERROR] : ";
-                    break;
-
-                case NLog::LogType::Warning:
-                    ss << "[WARNING] : ";
-                    break;
-
-                default:
-                    ss << "[INFO] : ";
-            }
-            ss << message;
-            std::string str = ss.str();
-
-            if (log.mConsole)
-                std::cout << str << std::endl;
-
-            if (log.mFile.is_open())
-                log.mFile << str << std::endl;
-
-            log.mType = NLog::LogType::Info;
-
+            NLog::log(message);
             return log;
         }
 
         friend NLog& operator<<(NLog& log, LogType type)
         {
-            log.mType = type;
+			NLog::setLogType(type);
             return log;
         }
+
+        static void setLogType(LogType type);
+		static LogType getLogType();
 
         static bool openLog(std::string const& filename);
         static bool isLogOpen();
 
         static void useConsole(bool use);
+		static bool usingConsole();
+
+		static void setOnline(std::string const& url, std::string const& uri, std::string const& appname = "", std::string const& appversion = "", std::string const& username = "");
+		static bool isOnline();
 
 	protected:
         NLog();
+		~NLog();
 
-		static NLog mInstance;
+		static NLog* mInstance;
 
     protected:
+        LogType mType;
         std::ofstream mFile;
         bool mConsole;
-        LogType mType;
+		bool mOnline;
+
+		lp::HttpThread mThread;
+
+        std::string mAppName;
+        std::string mAppVersion;
+        std::string mUsername;
 };
 
 #endif // NLOG_HPP

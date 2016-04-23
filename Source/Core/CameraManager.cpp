@@ -1,9 +1,10 @@
 #include "CameraManager.hpp"
-#include "../Application/Application.hpp"
+#include "World.hpp"
 
 NCameraManager::NCameraManager()
 {
     mActive = -1;
+    mView = NWorld::getWindow().getView();
 }
 
 NCameraManager::~NCameraManager()
@@ -24,7 +25,12 @@ void NCameraManager::removeCamera(NCameraComponent* camera)
     mCameras.remove(camera);
 }
 
-sf::View NCameraManager::getActiveView() const
+sf::View& NCameraManager::getView()
+{
+    return mView;
+}
+
+sf::View& NCameraManager::getActiveView()
 {
     if (mActive >= 0 && mActive < (int)mCameras.size())
     {
@@ -33,5 +39,12 @@ sf::View NCameraManager::getActiveView() const
             return mCameras[mActive]->getView();
         }
     }
-    return ah::Application::getWindow().getView();
+    return mView;
+}
+
+void NCameraManager::clear()
+{
+    mCameras.clear();
+    mActive = -1;
+    mView = NWorld::getWindow().getView();
 }

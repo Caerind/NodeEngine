@@ -10,11 +10,9 @@ class NCameraComponent : public NComponent
         NCameraComponent();
         ~NCameraComponent();
 
-        sf::View getView();
+        sf::View& getView();
 
-        void tick(sf::Time dt);
-
-        void setRotation(float rotation);
+        void onMovedThis();
 
     private:
         sf::View mView;

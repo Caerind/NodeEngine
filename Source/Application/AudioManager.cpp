@@ -8,18 +8,13 @@ namespace ah
 AudioManager::AudioManager()
 {
     mStatus = sf::SoundSource::Playing;
-    if (!load())
-    {
-        mGlobalVolume = 100.f;
-        mMusicVolume = 100.f;
-        mSoundVolume = 100.f;
-        save();
-    }
+    setGlobalVolume(100.f);
+    setMusicVolume(100.f);
+    setSoundVolume(100.f);
 }
 
 AudioManager::~AudioManager()
 {
-    save();
 }
 
 void AudioManager::registerMusicFile(std::string const& id, std::string const& filename)
@@ -27,7 +22,7 @@ void AudioManager::registerMusicFile(std::string const& id, std::string const& f
     mMusicFilenames[id] = filename;
 }
 
-std::shared_ptr<AudioSource> AudioManager::playMusic(std::string const& id, bool loop, sf::Vector2f const& position)
+std::shared_ptr<Music> AudioManager::playMusic(std::string const& id, bool loop, sf::Vector2f const& position)
 {
     std::string filename;
     if (mMusicFilenames.find(id) != mMusicFilenames.end())
@@ -54,39 +49,19 @@ std::shared_ptr<AudioSource> AudioManager::playMusic(std::string const& id, bool
     return nullptr;
 }
 
-std::shared_ptr<AudioSource> AudioManager::playSound(std::string const& id, bool loop, sf::Vector2f const& position)
+std::shared_ptr<Sound> AudioManager::playSound(std::string const& id, bool loop, sf::Vector2f const& position)
 {
-    if (ah::Application::getResources().isLoadedSoundBuffer(id))
+    auto s = std::make_shared<Sound>(ah::Application::getResources().getSoundBuffer(id),loop,position);
+    if (s != nullptr && mStatus != sf::SoundSource::Stopped && mAudioSources.size() < 256)
     {
-        auto s = std::make_shared<Sound>(ah::Application::getResources().getSoundBuffer(id),loop,position);
-        if (s != nullptr && mStatus != sf::SoundSource::Stopped && mAudioSources.size() < 256)
-        {
-            mAudioSources.push_back(s);
-            s->setVolume(mSoundVolume);
-            s->play();
-            if (mStatus == sf::SoundSource::Paused)
-            {
-                s->pause();
-            }
-            return s;
-        }
-    }
-    return nullptr;
-}
-
-std::shared_ptr<AudioSource> AudioManager::playPlaylist(std::vector<std::string> const& filenames, bool loop, sf::Vector2f const& position, bool random)
-{
-    auto p = std::make_shared<Playlist>(filenames,loop,position,random);
-    if (p != nullptr && mStatus != sf::SoundSource::Stopped && mAudioSources.size() < 256)
-    {
-        mAudioSources.push_back(p);
-        p->setVolume(mMusicVolume);
-        p->play();
+        mAudioSources.push_back(s);
+        s->setVolume(mSoundVolume);
+        s->play();
         if (mStatus == sf::SoundSource::Paused)
         {
-            p->pause();
+            s->pause();
         }
-        return p;
+        return s;
     }
     return nullptr;
 }
@@ -127,17 +102,17 @@ void AudioManager::stop()
 
 void AudioManager::update()
 {
-    for (auto itr = mAudioSources.begin(); itr != mAudioSources.end(); itr++)
+    for (auto itr = mAudioSources.begin(); itr != mAudioSources.end();)
     {
         (*itr)->update();
         if (mStatus != sf::SoundSource::Stopped && (*itr)->getStatus() == sf::SoundSource::Stopped)
         {
-            mAudioSources.erase(itr); // Remove stopped audios
+            itr = mAudioSources.erase(itr); // Remove stopped audios
         }
-    }
-    if (mGlobalVolume != sf::Listener::getGlobalVolume())
-    {
-        setGlobalVolume(mGlobalVolume);
+        else
+        {
+            itr++;
+        }
     }
 }
 
@@ -186,10 +161,10 @@ float AudioManager::getSoundVolume() const
     return mSoundVolume;
 }
 
-bool AudioManager::load()
+bool AudioManager::load(std::string const& filename)
 {
     pugi::xml_document doc;
-    if (!doc.load_file("Assets/Data/settings.xml"))
+    if (!doc.load_file(filename.c_str()))
     {
         return false;
     }
@@ -204,10 +179,10 @@ bool AudioManager::load()
     return false;
 }
 
-void AudioManager::save()
+void AudioManager::save(std::string const& filename)
 {
     pugi::xml_document doc;
-    doc.load_file("Assets/Data/settings.xml");
+    doc.load_file(filename.c_str());
     if (doc.child("Audio"))
     {
         doc.remove_child("Audio");
@@ -216,7 +191,7 @@ void AudioManager::save()
     audio.append_child("Global").append_attribute("value") = mGlobalVolume;
     audio.append_child("Music").append_attribute("value") = mMusicVolume;
     audio.append_child("Sound").append_attribute("value") = mSoundVolume;
-    doc.save_file("Assets/Data/settings.xml");
+    doc.save_file(filename.c_str());
 }
 
 sf::SoundSource::Status AudioManager::getStatus() const
@@ -352,6 +327,11 @@ bool Music::getLoop()
     return mMusic.getLoop();
 }
 
+sf::Music& Music::getMusic()
+{
+    return mMusic;
+}
+
 //////////////////////////////////////////////
 //////////////////////////////////////////////
 //////////////////////////////////////////////
@@ -415,118 +395,9 @@ bool Sound::getLoop()
     return mSound.getLoop();
 }
 
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-
-Playlist::Playlist(std::vector<std::string> const& filenames, bool loop, sf::Vector2f const& position, bool random)
+sf::Sound& Sound::getSound()
 {
-    mType = AudioSource::Type::Music;
-    mFilenames = filenames;
-    mLoop = loop;
-    mRandom = random;
-    mRandomPlayed = 0;
-    if (mRandom)
-    {
-        mActualId = NMath::random(0,(int)mFilenames.size()-1);
-    }
-    else
-    {
-        mActualId = 0;
-    }
-    if (mFilenames.size() > 0)
-    {
-        mMusic.openFromFile(mFilenames[mActualId]);
-    }
-    mMusic.setPosition(position.x,0.f,position.y);
-    mStatus = mMusic.getStatus();
-}
-
-void Playlist::play()
-{
-    mMusic.play();
-    mStatus = mMusic.getStatus();
-}
-
-void Playlist::pause()
-{
-    mMusic.pause();
-    mStatus = mMusic.getStatus();
-}
-
-void Playlist::stop()
-{
-    mMusic.stop();
-    mStatus = mMusic.getStatus();
-}
-
-void Playlist::update()
-{
-    if (mMusic.getStatus() != mStatus)
-    {
-        if (mRandom)
-        {
-            mRandomPlayed++;
-            if (mLoop || mRandomPlayed < mFilenames.size())
-            {
-                mActualId = NMath::random(0,(int)mFilenames.size()-1);
-                mMusic.openFromFile(mFilenames[mActualId]);
-                play();
-            }
-            else
-            {
-                stop();
-            }
-        }
-        else
-        {
-            if ((mActualId == mFilenames.size()-1 && mLoop) || mActualId < mFilenames.size()-1)
-            {
-                mActualId = (mActualId + 1) % (mFilenames.size());
-                mMusic.openFromFile(mFilenames[mActualId]);
-                play();
-            }
-            else
-            {
-                stop();
-            }
-        }
-    }
-}
-
-sf::SoundSource::Status Playlist::getStatus()
-{
-    return mStatus;
-}
-
-void Playlist::setVolume(float volume)
-{
-    mMusic.setVolume(volume);
-}
-
-void Playlist::setPosition(sf::Vector2f const& position)
-{
-    mMusic.setPosition(position.x,0.f,position.y);
-}
-
-void Playlist::setLoop(bool loop)
-{
-    mMusic.setLoop(loop);
-}
-
-float Playlist::getVolume()
-{
-    return mMusic.getVolume();
-}
-
-sf::Vector2f Playlist::getPosition()
-{
-    return sf::Vector2f(mMusic.getPosition().x,mMusic.getPosition().z);
-}
-
-bool Playlist::getLoop()
-{
-    return mMusic.getLoop();
+    return mSound;
 }
 
 } // namespace ah

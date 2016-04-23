@@ -10,6 +10,8 @@ namespace ah
 {
 
 class AudioSource;
+class Music;
+class Sound;
 class AudioManager
 {
     public:
@@ -18,9 +20,8 @@ class AudioManager
 
         void registerMusicFile(std::string const& id, std::string const& filename);
 
-        std::shared_ptr<AudioSource> playMusic(std::string const& id, bool loop = false, sf::Vector2f const& position = sf::Vector2f());
-        std::shared_ptr<AudioSource> playSound(std::string const& id, bool loop = false, sf::Vector2f const& position = sf::Vector2f());
-        std::shared_ptr<AudioSource> playPlaylist(std::vector<std::string> const& filenames, bool loop = false, sf::Vector2f const& position = sf::Vector2f(), bool random = false);
+        std::shared_ptr<Music> playMusic(std::string const& id, bool loop = false, sf::Vector2f const& position = sf::Vector2f());
+        std::shared_ptr<Sound> playSound(std::string const& id, bool loop = false, sf::Vector2f const& position = sf::Vector2f());
 
         void play();
         void pause();
@@ -35,8 +36,8 @@ class AudioManager
         float getMusicVolume() const;
         float getSoundVolume() const;
 
-        bool load();
-        void save();
+        bool load(std::string const& filename);
+        void save(std::string const& filename);
 
         sf::SoundSource::Status getStatus() const;
 
@@ -100,6 +101,8 @@ class Music : public AudioSource
         sf::Vector2f getPosition();
         bool getLoop();
 
+        sf::Music& getMusic();
+
     private:
         sf::Music mMusic;
 };
@@ -121,36 +124,10 @@ class Sound : public AudioSource
         sf::Vector2f getPosition();
         bool getLoop();
 
+        sf::Sound& getSound();
+
     private:
         sf::Sound mSound;
-};
-
-class Playlist : public AudioSource
-{
-    public:
-        Playlist(std::vector<std::string> const& filenames, bool loop, sf::Vector2f const& position, bool random);
-
-        void play();
-        void pause();
-        void stop();
-        void update();
-        sf::SoundSource::Status getStatus();
-
-        void setVolume(float volume);
-        void setPosition(sf::Vector2f const& position);
-        void setLoop(bool loop);
-        float getVolume();
-        sf::Vector2f getPosition();
-        bool getLoop();
-
-    protected:
-        sf::Music mMusic;
-        sf::SoundSource::Status mStatus;
-        std::size_t mActualId;
-        std::vector<std::string> mFilenames;
-        bool mLoop;
-        bool mRandom;
-        std::size_t mRandomPlayed;
 };
 
 } // namespace ah

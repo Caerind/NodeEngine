@@ -4,9 +4,7 @@
 namespace ah
 {
 
-State::State(StateManager& manager, std::string const& type)
-: mManager(manager)
-, mType(type)
+State::State(StateManager& manager) : mManager(manager)
 {
 }
 
@@ -26,16 +24,6 @@ bool State::update(sf::Time dt)
 
 void State::render(sf::RenderTarget& target, sf::RenderStates states)
 {
-}
-
-std::string State::getType() const
-{
-    return mType;
-}
-
-bool State::isActiveState() const
-{
-    return mType == mManager.getActiveStateType();
 }
 
 void State::onActivate()

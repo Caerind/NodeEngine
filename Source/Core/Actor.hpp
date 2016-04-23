@@ -2,9 +2,9 @@
 #define NACTOR_HPP
 
 #include <memory>
-#include "RootComponent.hpp"
+#include "Component.hpp"
 
-class NActor : public NRootComponent
+class NActor : public NComponent
 {
     public:
         NActor();

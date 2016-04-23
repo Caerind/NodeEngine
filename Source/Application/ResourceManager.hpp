@@ -6,9 +6,10 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 
-#include "../Utils/Pugixml.hpp"
-#include "../Utils/String.hpp"
-#include "../Utils/Assume.hpp"
+#include "../Utils/Shader.hpp"
+
+#include <iostream>
+#include <cassert>
 
 namespace ah
 {
@@ -19,117 +20,37 @@ class ResourceManager
         ResourceManager();
         ~ResourceManager();
 
-        bool load();
-        void save();
+        bool loadTexture(std::string const& id, std::string const& filename);
+        bool loadImage(std::string const& id, std::string const& filename);
+        bool loadFont(std::string const& id, std::string const& filename);
+        bool loadSoundBuffer(std::string const& id, std::string const& filename);
+        template <typename Parameter>
+        bool loadShader(std::string const& id, std::string const& filename, Parameter const& param);
 
-        void loadTexture(std::string const& id, std::string const& filename);
-        void loadImage(std::string const& id, std::string const& filename);
-        void loadFont(std::string const& id, std::string const& filename);
-        void loadSoundBuffer(std::string const& id, std::string const& filename);
-
-        bool isLoadedTexture(std::string const& id) const;
-        bool isLoadedImage(std::string const& id) const;
-        bool isLoadedFont(std::string const& id) const;
-        bool isLoadedSoundBuffer(std::string const& id) const;
-
-        sf::Texture& getTexture(std::string const& id, std::string const& filename = "");
-        sf::Image& getImage(std::string const& id, std::string const& filename = "");
-        sf::Font& getFont(std::string const& id, std::string const& filename = "");
-        sf::SoundBuffer& getSoundBuffer(std::string const& id, std::string const& filename = "");
+        sf::Texture& getTexture(std::string const& id);
+        sf::Image& getImage(std::string const& id);
+        sf::Font& getFont(std::string const& id);
+        sf::SoundBuffer& getSoundBuffer(std::string const& id);
+        lp::Shader& getShader(std::string const& id);
 
         void releaseTexture(std::string const& id);
         void releaseImage(std::string const& id);
         void releaseFont(std::string const& id);
         void releaseSoundBuffer(std::string const& id);
+        void releaseShader(std::string const& id);
 
     protected:
-        struct Resource
-        {
-            std::string type;
-            std::string id;
-            std::string filename;
-            bool loaded;
-        };
-
-        template <typename T>
-        struct ResourceHolder
-        {
-            std::map<std::string,std::pair<Resource,T>> resources;
-            Resource load(std::string const& id, std::string const& filename);
-            bool isLoaded(std::string const& id) const;
-            T& get(std::string const& id, std::string const& filename = "");
-            bool release(std::string const& id);
-        };
-
-        void removeResource(std::string const& id);
-
-    protected:
-        std::vector<Resource> mResources;
-
-        ResourceHolder<sf::Texture> mTextures;
-        ResourceHolder<sf::Image> mImages;
-        ResourceHolder<sf::Font> mFonts;
-        ResourceHolder<sf::SoundBuffer> mSoundBuffers;
+        std::map<std::string,sf::Texture> mTextures;
+        std::map<std::string,sf::Image> mImages;
+        std::map<std::string,sf::Font> mFonts;
+        std::map<std::string,sf::SoundBuffer> mSoundBuffers;
+        std::map<std::string,lp::Shader> mShaders;
 };
 
-template <typename T>
-ResourceManager::Resource ResourceManager::ResourceHolder<T>::load(std::string const& id, std::string const& filename)
+template <typename Parameter>
+bool ResourceManager::loadShader(std::string const& id, std::string const& filename, Parameter const& param)
 {
-    Resource r;
-    r.type = NString::type<T>();
-    r.id = id;
-    r.filename = filename;
-    resources[r.id].first = r;
-    if (!resources[r.id].second.loadFromFile(filename))
-    {
-        resources[r.id].first.loaded = false;
-    }
-    else
-    {
-        resources[r.id].first.loaded = true;
-    }
-    return r;
-}
-
-template <typename T>
-bool ResourceManager::ResourceHolder<T>::isLoaded(std::string const& id) const
-{
-    if (resources.find(id) == resources.end())
-    {
-        return false;
-    }
-    return resources.at(id).first.loaded;
-}
-
-template <typename T>
-T& ResourceManager::ResourceHolder<T>::get(std::string const& id, std::string const& filename)
-{
-    if (filename != "")
-    {
-        load(id,filename);
-    }
-    for (auto itr = resources.begin(); itr != resources.end(); itr++)
-    {
-        if (itr->first == id)
-        {
-            return itr->second.second;
-        }
-    }
-    Assume(false);
-}
-
-template <typename T>
-bool ResourceManager::ResourceHolder<T>::release(std::string const& id)
-{
-    for (auto itr = resources.begin(); itr != resources.end(); itr++)
-    {
-        if (itr->first == id)
-        {
-            resources.erase(itr);
-            return true;
-        }
-    }
-    return false;
+    return mShaders[id].loadFromFile(filename,param);
 }
 
 } // namespace ah

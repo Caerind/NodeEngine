@@ -69,20 +69,6 @@ std::size_t StateManager::size() const
 	return mStates.size();
 }
 
-std::string StateManager::getActiveStateType() const
-{
-    if (!mStates.empty())
-    {
-        return mStates.back()->getType();
-    }
-    return "";
-}
-
-std::string StateManager::getLastActiveStateType() const
-{
-    return mLastActiveStateType;
-}
-
 void StateManager::applyPendingChanges()
 {
     for(PendingChange change : mPendingList)
@@ -92,7 +78,6 @@ void StateManager::applyPendingChanges()
 			case Action::Push:
                 if (!mStates.empty())
                 {
-                    mLastActiveStateType = mStates.back()->getType();
                     mStates.back()->onDeactivate();
                 }
 				mStates.push_back(createState(change.id));
@@ -102,7 +87,6 @@ void StateManager::applyPendingChanges()
 			case Action::Pop:
                 if (!mStates.empty())
                 {
-                    mLastActiveStateType = mStates.back()->getType();
                     mStates.back()->onDeactivate();
                 }
 				mStates.pop_back();
@@ -115,7 +99,6 @@ void StateManager::applyPendingChanges()
 			case Action::Clear:
                 if (!mStates.empty())
                 {
-                    mLastActiveStateType = mStates.back()->getType();
                     mStates.back()->onDeactivate();
                 }
                 mStates.clear();
@@ -128,7 +111,11 @@ void StateManager::applyPendingChanges()
 State::Ptr StateManager::createState(std::string const& id)
 {
 	auto found = mFactories.find(id);
-	Assume((found != mFactories.end()));
+	if (found == mFactories.end())
+    {
+        std::cerr << "State : " << id << " : cant be loaded" << std::endl;
+        assert(false);
+    }
 	return found->second();
 }
 

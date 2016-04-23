@@ -6,7 +6,7 @@
 #include "AudioManager.hpp"
 #include "ResourceManager.hpp"
 #include "LangManager.hpp"
-#include "../Utils/Log.hpp"
+#include "ValueContainer.hpp"
 
 namespace ah
 {
@@ -17,24 +17,29 @@ class Application
         static Application& instance();
 
         static void run();
+        static void close();
 
         static StateManager& getStates();
         static Window& getWindow();
         static AudioManager& getAudio();
         static ResourceManager& getResources();
         static LangManager& getLang();
+        static ValueContainer& getValues();
 
     private:
         Application();
         ~Application();
 
-        static Application mInstance;
+        static Application* mInstance;
+
+        bool mRunning;
 
         StateManager mStates;
         Window mWindow;
         AudioManager mAudio;
         ResourceManager mResources;
         LangManager mLang;
+        ValueContainer mValues;
 };
 
 } // namespace ah

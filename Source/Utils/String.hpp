@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 #include <typeinfo>
+#include <vector>
 
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -13,6 +14,9 @@
 
 namespace NString
 {
+
+
+#ifdef N_DESKTOP_PLATFORM
 
 #ifdef __GNUG__ // GCC
 
@@ -46,6 +50,8 @@ template < typename T > std::string type()
 
 template < typename T > std::string Type( const T& obj )
 { return readable_name( typeid(obj).name() ) ; }
+
+#endif // N_DESKTOP_PLATFORM
 
 void toLower(std::string& str);
 void toUpper(std::string& str);

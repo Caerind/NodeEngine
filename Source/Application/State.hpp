@@ -10,8 +10,6 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include "../Utils/String.hpp"
-
 namespace ah
 {
 
@@ -23,15 +21,12 @@ class State : public sf::Transformable
         typedef std::unique_ptr<State> Ptr;
 
     public:
-        State(StateManager& manager, std::string const& type = "State");
+        State(StateManager& manager);
         virtual ~State();
 
         virtual bool handleEvent(sf::Event const& event);
         virtual bool update(sf::Time dt);
         virtual void render(sf::RenderTarget& target, sf::RenderStates states);
-
-        std::string getType() const;
-        bool isActiveState() const;
 
         virtual void onActivate();
         virtual void onDeactivate();
@@ -43,7 +38,6 @@ class State : public sf::Transformable
 
     protected:
         StateManager& mManager;
-        std::string mType;
 };
 
 } // namespace ah
