@@ -4,22 +4,30 @@ NGraphicManager::NGraphicManager() : mEffect(nullptr)
 {
     mRenderOrder = [](NSceneComponent* a, NSceneComponent* b) -> bool
     {
-       if (a != nullptr && b != nullptr)
-       {
-           if (a->getFinalZ() < b->getFinalZ())
-           {
+        if (a != nullptr && b != nullptr)
+        {
+            if (a->getFinalZ() < b->getFinalZ())
+            {
                 return true;
-           }
-           else if (a->getFinalZ() > b->getFinalZ())
-           {
-               return false;
-           }
-           else
-           {
-               return (a->getFinalPosition().y < b->getFinalPosition().y);
-           }
-       }
-       return true;
+            }
+            else if (a->getFinalZ() > b->getFinalZ())
+            {
+                return false;
+            }
+            else if (a->getFinalPosition().y < b->getFinalPosition().y)
+            {
+                return true;
+            }
+            else if (a->getFinalPosition().y > b->getFinalPosition().y)
+            {
+                return false;
+            }
+            else
+            {
+                return (a->getFinalPosition().x < b->getFinalPosition().x);
+            }
+        }
+        return true;
     };
 
     mNeedUpdateOrder = true;
@@ -36,7 +44,7 @@ void NGraphicManager::render(sf::RenderTarget& target)
 {
     if (mNeedUpdateOrder)
     {
-        mRenderables.sort(mRenderOrder);
+        std::sort(mRenderables.begin(),mRenderables.end(),mRenderOrder);
         mNeedUpdateOrder = false;
     }
 
@@ -89,19 +97,19 @@ std::size_t NGraphicManager::getRenderableCount() const
 
 void NGraphicManager::addRenderable(NSceneComponent* renderable)
 {
-    mRenderables.add(renderable);
+    mRenderables.push_back(renderable);
     needUpdateOrder();
 }
 
 void NGraphicManager::removeRenderable(NSceneComponent* renderable)
 {
-    mRenderables.remove(renderable);
+    remove(mRenderables,renderable);
     needUpdateOrder();
 }
 
 NParticleSystem::Ptr NGraphicManager::getParticleSystem(std::string const& systemId)
 {
-    if (!mParticleSystems.contains(systemId))
+    if (!contains(mParticleSystems,systemId))
     {
         mParticleSystems[systemId] = std::make_shared<NParticleSystem>();
     }
@@ -110,7 +118,7 @@ NParticleSystem::Ptr NGraphicManager::getParticleSystem(std::string const& syste
 
 void NGraphicManager::removeParticleSystem(std::string const& systemId)
 {
-    mParticleSystems.remove(systemId);
+    remove(mParticleSystems,systemId);
 }
 
 std::size_t NGraphicManager::getParticleSystemCount() const

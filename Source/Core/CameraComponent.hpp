@@ -13,8 +13,10 @@ class NCameraComponent : public NComponent
         sf::View& getView();
 
         void onMovedThis();
+        void onScaledThis();
+        void onRotatedThis();
 
-    private:
+    protected:
         sf::View mView;
 };
 

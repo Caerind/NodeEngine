@@ -14,7 +14,7 @@ NWorld& NWorld::instance()
 
 void NWorld::addEvent(sf::Event const& event)
 {
-    instance().mEvents.add(event);
+    add(instance().mEvents,event);
 }
 
 /*
@@ -45,10 +45,59 @@ bool NWorld::testAction(NAction const& action)
 
 void NWorld::tick(sf::Time dt)
 {
+    // Actors
+    std::size_t s2, s1 = instance().mActorsDeletions.size();
+    for (std::size_t i = 0; i < s1; i++)
+    {
+        s2 = instance().mActors.size();
+        for (std::size_t j = 0; j < s2; j++)
+        {
+            if (instance().mActors[j]->getId() == instance().mActorsDeletions[i])
+            {
+                erase(instance().mActors,j);
+                break;
+            }
+        }
+    }
+    instance().mActorsDeletions.clear();
+
+    // Tickables
+    s1 = instance().mTickableAdditions.size();
+    for (std::size_t i = 0; i < s1; i++)
+    {
+        add(instance().mTickables,instance().mTickableAdditions[i]);
+    }
+    instance().mTickableAdditions.clear();
+
+    s2 = instance().mTickableDeletions.size();
+    for (std::size_t i = 0; i < s2; i++)
+    {
+        remove(instance().mTickables,instance().mTickableDeletions[i]);
+    }
+    instance().mTickableDeletions.clear();
+
     // Tickables
     for (auto itr = instance().mTickables.begin(); itr != instance().mTickables.end(); itr++)
     {
-        (*itr)->tick(dt);
+        if (!(*itr)->hasTicked())
+        {
+            (*itr)->tick(dt);
+            (*itr)->ticked();
+        }
+        std::size_t s = instance().mTickableDeletions.size();
+        if (s > 0)
+        {
+            for (std::size_t i = 0; i < s; i++)
+            {
+                remove(instance().mTickables,instance().mTickableDeletions[i]);
+            }
+            instance().mTickableDeletions.clear();
+            itr = instance().mTickables.begin();
+        }
+    }
+    for (auto itr = instance().mTickables.begin(); itr != instance().mTickables.end(); itr++)
+    {
+        (*itr)->unticked();
     }
 
     // Timers
@@ -59,22 +108,6 @@ void NWorld::tick(sf::Time dt)
 
     // Events
     instance().mEvents.clear();
-
-    // Actors
-    std::size_t s2, s1 = instance().mActorsDeletions.size();
-    for (std::size_t i = 0; i < s1; i++)
-    {
-        s2 = instance().mActors.size();
-        for (std::size_t j = 0; j < s2; j++)
-        {
-            if (instance().mActors[j]->getId() == instance().mActorsDeletions[i])
-            {
-                instance().mActors.erase(j);
-                break;
-            }
-        }
-    }
-    instance().mActorsDeletions.clear();
 }
 
 void NWorld::render()
@@ -95,7 +128,7 @@ void NWorld::clear()
 
 NActor::Ptr NWorld::getActor(std::size_t index)
 {
-    if (instance().mActors.validIndex(index))
+    if (validIndex(instance().mActors,index))
     {
         return instance().mActors[index];
     }
@@ -120,13 +153,13 @@ void NWorld::removeActor(std::size_t index)
     NActor::Ptr a = getActor(index);
     if (a != nullptr)
     {
-        instance().mActorsDeletions.add(a->getId());
+        add(instance().mActorsDeletions,a->getId());
     }
 }
 
 void NWorld::removeActor(std::string const& id)
 {
-    instance().mActorsDeletions.add(id);
+    add(instance().mActorsDeletions,id);
 }
 
 bool NWorld::load(std::string const& filename)
@@ -144,12 +177,12 @@ bool NWorld::load(std::string const& filename)
     for (pugi::xml_node actor = actors.first_child(); actor; actor = actor.next_sibling())
     {
         std::string type = actor.attribute("type").value();
-        if (instance().mActorFactory.contains(type))
+        if (contains(instance().mActorFactory,type))
         {
             auto a = instance().mActorFactory[type]();
             a->load(actor);
             a->NActor::load(actor);
-            instance().mActors.add(a);
+            add(instance().mActors,a);
         }
     }
 
@@ -203,14 +236,14 @@ std::size_t NWorld::getTickableCount()
     return instance().mTickables.size();
 }
 
-NVector NWorld::getPointerPositionScreen(int touchIndex)
+sf::Vector2f NWorld::getPointerPositionScreen(int touchIndex)
 {
-    return NVector::SFML2FToN(getWindow().getPointerPosition(touchIndex));
+    return getWindow().getPointerPosition(touchIndex);
 }
 
-NVector NWorld::getPointerPositionView(int touchIndex)
+sf::Vector2f NWorld::getPointerPositionView(int touchIndex)
 {
-    return NVector::SFML2FToN(getWindow().getPointerPositionView(getActiveView(),touchIndex));
+    return getWindow().getPointerPositionView(getActiveView(),touchIndex);
 }
 
 ah::ResourceManager& NWorld::getResources()
@@ -245,7 +278,7 @@ std::string NWorld::startTimer()
 
 sf::Time NWorld::getTimerElapsed(std::string const& handle)
 {
-    if (instance().mTimers.contains(handle))
+    if (contains(instance().mTimers,handle))
     {
         return instance().mTimers[handle].getElapsedTime();
     }
@@ -254,7 +287,7 @@ sf::Time NWorld::getTimerElapsed(std::string const& handle)
 
 sf::Time NWorld::getTimerRemaining(std::string const& handle)
 {
-    if (instance().mTimers.contains(handle))
+    if (contains(instance().mTimers,handle))
     {
         return instance().mTimers[handle].getRemaining();
     }
@@ -263,7 +296,7 @@ sf::Time NWorld::getTimerRemaining(std::string const& handle)
 
 sf::Time NWorld::getTimerDuration(std::string const& handle)
 {
-    if (instance().mTimers.contains(handle))
+    if (contains(instance().mTimers,handle))
     {
         return instance().mTimers[handle].getDuration();
     }
@@ -272,7 +305,7 @@ sf::Time NWorld::getTimerDuration(std::string const& handle)
 
 void NWorld::repeatTimer(std::string const& handle, bool repeat)
 {
-    if (instance().mTimers.contains(handle))
+    if (contains(instance().mTimers,handle))
     {
         instance().mTimers[handle].setRepeat(repeat);
     }
@@ -280,7 +313,7 @@ void NWorld::repeatTimer(std::string const& handle, bool repeat)
 
 void NWorld::playTimer(std::string const& handle)
 {
-    if (instance().mTimers.contains(handle))
+    if (contains(instance().mTimers,handle))
     {
         instance().mTimers[handle].play();
     }
@@ -288,7 +321,7 @@ void NWorld::playTimer(std::string const& handle)
 
 void NWorld::pauseTimer(std::string const& handle)
 {
-    if (instance().mTimers.contains(handle))
+    if (contains(instance().mTimers,handle))
     {
         instance().mTimers[handle].pause();
     }
@@ -296,7 +329,7 @@ void NWorld::pauseTimer(std::string const& handle)
 
 void NWorld::resetTimer(std::string const& handle, sf::Time newDuration)
 {
-    if (instance().mTimers.contains(handle))
+    if (contains(instance().mTimers,handle))
     {
         instance().mTimers[handle].reset(newDuration);
     }
@@ -304,7 +337,7 @@ void NWorld::resetTimer(std::string const& handle, sf::Time newDuration)
 
 void NWorld::stopTimer(std::string const& handle)
 {
-    instance().mTimers.remove(handle);
+    remove(instance().mTimers,handle);
 }
 
 void NWorld::addRenderable(NSceneComponent* renderable)
@@ -319,12 +352,12 @@ void NWorld::removeRenderable(NSceneComponent* renderable)
 
 void NWorld::addTickable(NTickable* tickable)
 {
-    mTickables.add(tickable);
+    add(mTickableAdditions,tickable);
 }
 
 void NWorld::removeTickable(NTickable* tickable)
 {
-    mTickables.remove(tickable);
+    add(mTickableDeletions,tickable);
 }
 
 NParticleSystem::Ptr NWorld::getParticleSystem(std::string const& systemId)

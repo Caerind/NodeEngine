@@ -4,55 +4,48 @@
 #include <vector>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 
 #include "SceneComponent.hpp"
 
 class NLayerComponent : public NSceneComponent
 {
     public:
-        NLayerComponent();
+        NLayerComponent(sf::Vector2i coords = sf::Vector2i(0,0));
+        NLayerComponent(std::string const& textureName, sf::Vector2i layerSize, sf::Vector2i tileSize, sf::Vector2i coords = sf::Vector2i(0,0));
 
-        enum Type
-        {
-            Orthogonal,
-            Isometric,
-            Hexagonal,
-        };
+        void create(std::string const& textureName, sf::Vector2i layerSize, sf::Vector2i tileSize);
 
-        void create(std::string const& textureName, sf::Vector2i mapSize, sf::Vector2i tileSize, int type = Type::Orthogonal, int hexSide = 0);
+        sf::Vector2i getCoords() const;
 
         bool loadFromCode(std::string const& code);
-        std::string saveToCode();
+        std::string getCode() const;
 
-        sf::Vector2i getMapSize() const;
+        sf::Vector2i getLayerSize() const;
         sf::Vector2i getTileSize() const;
 
         void render(sf::RenderTarget& target);
 
         sf::FloatRect getBounds() const;
-        bool contains(NVector const& position) const;
 
-        int getType() const;
-        bool isOrthogonal() const;
-        bool isIsometric() const;
-        bool isHexagonal() const;
+        void fill(int id);
 
         void setTileId(sf::Vector2i const& coords, int id);
-        int getTileId(sf::Vector2i const& coords);
+        int getTileId(sf::Vector2i const& coords) const;
 
-        sf::IntRect idToRect(int id);
-        int rectToId(sf::IntRect const& rect);
+        sf::IntRect idToRect(int id) const;
+        int rectToId(sf::IntRect const& rect) const;
 
         virtual void load(pugi::xml_node& node, std::string const& name = "LayerComponent");
         virtual void save(pugi::xml_node& node, std::string const& name = "LayerComponent");
 
-    private:
-        std::vector<sf::Sprite> mTiles;
-        std::string mTexture;
-        sf::Vector2i mMapSize;
+    protected:
+        sf::Vector2i mCoords;
+        sf::VertexArray mVertices;
+        sf::Texture* mTexture;
+        std::string mTextureName;
+        sf::Vector2i mLayerSize;
         sf::Vector2i mTileSize;
-        int mType;
-        int mHexSide;
 };
 
 #endif // NLAYERCOMPONENT_HPP
